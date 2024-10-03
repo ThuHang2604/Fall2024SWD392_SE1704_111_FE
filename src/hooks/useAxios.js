@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import useAuth from './useAuth';
 
 const useAxios = () => {
-  const baseURL = `${process.env.REACT_APP_BACKEND_API}`;
+  const baseURL = process.env.REACT_APP_BACKEND_API || 'http://localhost:3000';
   const { token } = useAuth();
 
   const axiosInstance = axios.create({
