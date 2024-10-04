@@ -7,15 +7,16 @@ export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, 
     const response = await instance.post('api/v1/users/Login', {
       username: credentials.username,
       password: credentials.password,
+      role: credentials.role,
     });
-    console.log('Login response:', response);
     const { data } = response;
-    console.log('data là', data.token);
-    setUserAuthToken(data.token);
+    console.log('data role:', data);
+    if (data.status !== 1) {
+      return rejectWithValue('User account is inactive or banned');
+    }
 
-    return data;
+    return data; // Should include role and status in data
   } catch (error) {
-    console.error('Error during login:', error);
     return rejectWithValue(error.response?.data || 'Login failed');
   }
 });
@@ -71,9 +72,14 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.user;
-        state.token = action.payload.token;
+
+        // Set the user fields from the response
+        const { userId, userName, password, phone, status, role } = action.payload;
+
+        // Store the user data in the state
+        state.user = { userId, userName, password, phone, status, role };
         state.isAuthenticated = true;
+        state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
