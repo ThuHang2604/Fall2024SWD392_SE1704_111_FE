@@ -12,7 +12,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isLoading, isAuthenticated, error, user } = useSelector((state) => state.auth);
+  const { isLoading, isAuthenticated, error } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
 
   const INITIAL_FORM_STATE = {
@@ -33,6 +33,11 @@ function LoginPage() {
     dispatch(loginUser(values));
   };
 
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    toast.success('Successfully logged out');
+  };
+
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/dashboard', { replace: true });
@@ -45,24 +50,13 @@ function LoginPage() {
     }
   }, [error]);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      const role = user.role;
-
-      if (role === 1) {
-        navigate('/', { replace: true });
-      } else if (role >= 2 && role <= 5) {
-        navigate('/dashboard', { replace: true });
-      }
-    }
-  }, [isAuthenticated, navigate, user]);
-
   return (
     <Container maxWidth="sm">
       <Box mt={5} p={3}>
         <Typography variant="h4" mb={5} fontWeight="bold">
-          Log In
+          {isAuthenticated ? 'Welcome Back!' : 'Log In'}
         </Typography>
+
         {!isAuthenticated ? (
           <Formik
             initialValues={INITIAL_FORM_STATE}
@@ -122,8 +116,13 @@ function LoginPage() {
               </Form>
             )}
           </Formik>
-        ) : null}{' '}
-        {/* No logout or welcome message */}
+        ) : (
+          <Box>
+            <Button fullWidth variant="contained" color="secondary" onClick={handleLogout} sx={{ mt: 3 }}>
+              Log Out
+            </Button>
+          </Box>
+        )}
       </Box>
     </Container>
   );
