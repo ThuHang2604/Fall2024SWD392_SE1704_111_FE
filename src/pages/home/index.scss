@@ -1,0 +1,199 @@
+// Variables
+$primary-color: #ff6c37;
+$secondary-color: #ffdc5e;
+$font-title: 'Monoton', Fantasy, sans-serif;
+$black-color: black;
+$hover-color: #333;
+$purple-color: #6a0dad;
+$white-color: white;
+
+// Container
+.homepage-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 50px;
+  background-color: $primary-color;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+// Title Section
+.title {
+  width: 700px;
+  font-size: 110px;
+  color: $secondary-color;
+  font-family: $font-title;
+}
+
+.subtitle-block {
+  position: absolute;
+  top: 580px; // Block đen ngay trên subtitle
+  left: 550px;
+  width: 50px;
+  height: 10px;
+  background-color: $black-color;
+}
+
+.subtitle {
+  position: absolute;
+  top: 600px;
+  left: 520px;
+  font-size: 20px;
+  font-weight: 700;
+  color: $black-color;
+  width: 200px;
+}
+
+// Top Section
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px;
+}
+
+.left-section {
+  flex: 1;
+  text-align: left;
+}
+
+.right-section {
+  flex: 1;
+  text-align: right;
+}
+
+// Main Image
+.main-image {
+  width: 400px;
+  max-width: 100%;
+}
+
+.book-button {
+  margin-top: 30px;
+  padding: 10px 30px;
+  background-color: $black-color;
+  color: $white-color;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+}
+
+// Right Section
+.right-section {
+  flex: 1;
+  text-align: right;
+}
+
+.main-image {
+  width: 500px;
+  margin-right: 100px;
+}
+
+// Social Links
+.social-links {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.social-icon {
+  display: block;
+  color: $black-color;
+  margin-bottom: 10px;
+}
+
+// About Section
+.about-section {
+  margin-top: 50px;
+  padding: 50px;
+  background-color: $white-color;
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+// Title "ABOUT"
+.about-title {
+  font-size: 60px;
+  font-weight: bold;
+  color: $purple-color;
+  text-align: left;
+  font-family: $font-title;
+  margin-bottom: 0;
+}
+
+// Nội dung
+.about-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 60%;
+}
+
+// Phần văn bản bên trái và gợn sóng
+.text-and-wave {
+  display: flex;
+  align-items: flex-start;
+}
+
+.about-text {
+  flex: 1;
+  padding-right: 40px;
+
+  p {
+    text-align: left;
+    width: 400px;
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+}
+
+.about-subtitle {
+  font-size: 24px;
+  font-weight: bold;
+  color: $black-color;
+  margin-bottom: 10px;
+  text-align: left;
+}
+
+.read-more {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: $black-color;
+  color: $white-color;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $hover-color;
+  }
+}
+
+// Phần hình ảnh bên phải
+.about-image {
+  flex: 1;
+  text-align: right;
+
+  img {
+    width: 400px;
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+
+// Wavy line
+.wavy-line {
+  width: 10px;
+  height: 150px;
+  background: repeating-linear-gradient(0deg, black 0%, black 10%, transparent 10%, transparent 20%);
+  margin-left: 20px;
+}

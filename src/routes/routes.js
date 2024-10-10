@@ -1,4 +1,4 @@
-import HomePage from '@/pages/HomePage';
+import HomePage from '@/pages/home/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import ForgotPassword from '@/pages/ForgotPassword';
 import RegisterPage from '@/pages/Register/RegisterPage';
