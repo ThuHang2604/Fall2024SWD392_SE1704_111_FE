@@ -3,6 +3,7 @@ import { publicRoutes, adminRoutes } from './routes/routes';
 import './App.css';
 
 import DefaultLayout from './layout/DefaultLayout';
+import AdminLayout from './layout/AdminLayout';
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
           {/* Admin routes */}
           <Route>
             {adminRoutes.map((item, index) => {
-              const Layout = item.layout || DefaultLayout;
+              const Layout = item.layout || AdminLayout;
               const Page = item.component;
               return (
                 <Route

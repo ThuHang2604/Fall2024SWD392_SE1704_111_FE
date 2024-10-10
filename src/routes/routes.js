@@ -2,11 +2,12 @@ import HomePage from '@/pages/home/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import ForgotPassword from '@/pages/ForgotPassword';
 import RegisterPage from '@/pages/RegisterPage';
-import Dashboard from '@/pages/Dashboard';
+import Dashboard from '@/pages/Manager/Dashboard';
 import ServicePage from '@/pages/ServicePage';
 import ServiceDetail from '@/pages/ServiceDetail';
 import BookingPage from '@/pages/BookingPage';
 import PaymentPage from '@/pages/PaymentPage';
+import ServiceList from '@/pages/Manager/ServiceList';
 
 const publicRoutes = [
   {
@@ -59,6 +60,11 @@ const adminRoutes = [
     title: 'Dashboard',
     path: '/dashboard',
     component: Dashboard,
+  },
+  {
+    title: 'Service List',
+    path: '/service-list',
+    component: ServiceList,
   },
 ];
 

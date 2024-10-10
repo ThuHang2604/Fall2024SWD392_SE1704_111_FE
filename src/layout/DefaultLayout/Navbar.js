@@ -24,7 +24,7 @@ const Navbar = () => {
         {/* Logo */}
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <img
-            src="https://i.pinimg.com/564x/41/ca/ef/41caefab07c2d9dc624d449d11faa458.jpg"
+            src="https://i.pinimg.com/564x/3d/ac/29/3dac291fd07904156ed2448c7c65dfe6.jpg"
             alt="Logo"
             style={{ width: '50px', height: '50px' }}
           />

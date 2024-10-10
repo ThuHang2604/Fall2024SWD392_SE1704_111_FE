@@ -63,11 +63,11 @@ function RegisterPage() {
       <Box
         sx={{
           backgroundColor: 'white',
-          padding: 5, // Increase padding for larger form
+          padding: 5,
           borderRadius: 2,
           boxShadow: 3,
           width: '100%',
-          maxWidth: '600px', // Increase maxWidth for larger form
+          maxWidth: '600px',
         }}
       >
         <Typography variant="h4" mb={5} fontWeight="bold" align="center">
