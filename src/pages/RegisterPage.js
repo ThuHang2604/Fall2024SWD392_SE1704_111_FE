@@ -1,44 +1,47 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { loginUser } from '../redux/slice/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerUser } from '../redux/slice/authSlice';
 
-function LoginPage() {
-  const dispatch = useDispatch();
+function RegisterPage() {
   const navigate = useNavigate();
-  const { isLoading } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector((state) => state.auth);
 
   const INITIAL_FORM_STATE = {
     username: '',
+    phone: '',
     password: '',
   };
 
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string().required('Username is required'),
+    phone: Yup.string().required('Phone number is required'),
     password: Yup.string().required('Password is required'),
   });
 
-  const handleSubmitLogin = async (values) => {
+  const handleSubmitRegister = async (values) => {
     const resultAction = await dispatch(
-      loginUser({
+      registerUser({
         username: values.username,
+        phone: values.phone,
         password: values.password,
       }),
     );
 
-    if (loginUser.fulfilled.match(resultAction)) {
-      toast.success('Logged in successfully');
-      navigate('/');
+    if (registerUser.fulfilled.match(resultAction)) {
+      toast.success('Your account has been successfully registered. Please log in to continue.');
+      navigate('/login');
     } else {
       if (resultAction.payload) {
         toast.error(resultAction.payload);
       } else {
-        toast.error('Login failed. Please check your credentials.');
+        toast.error('Account registration failed. Please check your information and try again.');
       }
     }
   };
@@ -68,10 +71,16 @@ function LoginPage() {
         }}
       >
         <Typography variant="h4" mb={5} fontWeight="bold" align="center">
-          Log In
+          Sign Up Now
         </Typography>
 
-        <Formik initialValues={INITIAL_FORM_STATE} validationSchema={FORM_VALIDATION} onSubmit={handleSubmitLogin}>
+        <Formik
+          initialValues={INITIAL_FORM_STATE}
+          validationSchema={FORM_VALIDATION}
+          onSubmit={handleSubmitRegister}
+          validateOnChange={true}
+          validateOnBlur={true}
+        >
           {({ isSubmitting }) => (
             <Form>
               <Field name="username">
@@ -79,21 +88,15 @@ function LoginPage() {
               </Field>
               <ErrorMessage name="username" component="div" className="text-danger" />
 
+              <Field name="phone">
+                {({ field }) => <TextField fullWidth margin="normal" label="Phone number" {...field} />}
+              </Field>
+              <ErrorMessage name="phone" component="div" className="text-danger" />
+
               <Field name="password">
                 {({ field }) => <TextField fullWidth margin="normal" label="Password" type="password" {...field} />}
               </Field>
               <ErrorMessage name="password" component="div" className="text-danger" />
-
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography
-                  variant="body2"
-                  component="a"
-                  href="#"
-                  sx={{ textDecoration: 'none', color: 'primary.main' }}
-                >
-                  Forgot password?
-                </Typography>
-              </Box>
 
               <Button
                 fullWidth
@@ -103,22 +106,8 @@ function LoginPage() {
                 disabled={isLoading || isSubmitting}
                 sx={{ mt: 3 }}
               >
-                {isLoading ? 'Loading...' : 'Log In'}
+                {isLoading ? 'Loading...' : 'Sign Up'}
               </Button>
-
-              <Box textAlign="center" mt={2}>
-                <Typography variant="body2">
-                  Not a member?{' '}
-                  <Typography
-                    variant="body2"
-                    component="a"
-                    href="/register"
-                    sx={{ textDecoration: 'none', color: 'primary.main' }}
-                  >
-                    Sign Up
-                  </Typography>
-                </Typography>
-              </Box>
 
               <ToastContainer position="top-right" autoClose={3000} />
             </Form>
@@ -129,4 +118,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default RegisterPage;

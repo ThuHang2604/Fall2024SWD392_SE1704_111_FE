@@ -100,19 +100,34 @@ const Navbar = () => {
               </Button>
             </>
           ) : (
-            <Button
-              component={Link}
-              to="/login"
-              sx={{
-                color: 'black',
-                fontSize: '16px',
-                letterSpacing: '1.5px',
-                fontWeight: 'bold',
-                textTransform: 'none',
-              }}
-            >
-              Log In
-            </Button>
+            <div>
+              <Button
+                component={Link}
+                to="/login"
+                sx={{
+                  color: 'black',
+                  fontSize: '16px',
+                  letterSpacing: '1.5px',
+                  fontWeight: 'bold',
+                  textTransform: 'none',
+                }}
+              >
+                Log In
+              </Button>
+              <Button
+                component={Link}
+                to="/register"
+                sx={{
+                  color: 'black',
+                  fontSize: '16px',
+                  letterSpacing: '1.5px',
+                  fontWeight: 'bold',
+                  textTransform: 'none',
+                }}
+              >
+                Sign Up
+              </Button>
+            </div>
           )}
         </Box>
       </Toolbar>
