@@ -8,15 +8,24 @@ $purple-color: #6a0dad;
 $white-color: white;
 
 // Container
+
+.outer-container {
+  /* Adjust padding as needed */
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .homepage-container {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  padding: 50px;
+  padding: 50px 50px 0 50px;
   background-color: $primary-color;
   min-height: 100vh;
-  overflow-y: auto;
+  width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 // Title Section
@@ -115,8 +124,49 @@ $white-color: white;
   background-color: $white-color;
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: center;
   align-items: center;
+  position: relative;
+}
+
+// About Cover (Thêm viền ngắn ở 4 góc)
+.about-cover {
+  width: 80%;
+  padding: 20px;
+}
+
+.about-content {
+  --b: 8px; /* Độ dày viền */
+  --s: 60px; /* Kích thước của góc */
+  --g: 14px; /* Khoảng cách viền */
+  --c: #edc951; /* Màu của góc */
+
+  padding: calc(var(--b) + var(--g));
+  background-image: conic-gradient(from 90deg at top var(--b) left var(--b), #0000 25%, var(--c) 0),
+    conic-gradient(from -90deg at bottom var(--b) right var(--b), #0000 25%, var(--c) 0);
+  background-position:
+    var(--_p, 0%) var(--_p, 0%),
+    calc(100% - var(--_p, 0%)) calc(100% - var(--_p, 0%));
+  background-size: var(--s) var(--s);
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition:
+    background-position 0.3s var(--_i, 0.3s),
+    background-size 0.3s calc(0.3s - var(--_i, 0.3s));
+}
+
+.about-content.alt {
+  background-image: conic-gradient(from 180deg at top var(--b) right var(--b), #0000 25%, var(--c) 0),
+    conic-gradient(from 0deg at bottom var(--b) left var(--b), #0000 25%, var(--c) 0);
+  background-position:
+    calc(100% - var(--_p, 0%)) var(--_p, 0%),
+    var(--_p, 0%) calc(100% - var(--_p, 0%));
+}
+
+.about-content:hover {
+  background-size: calc(100% - var(--g)) calc(100% - var(--g));
+  --_p: calc(var(--g) / 2);
+  --_i: 0s;
 }
 
 // Title "ABOUT"
@@ -132,9 +182,9 @@ $white-color: white;
 // Nội dung
 .about-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
-  width: 60%;
+  width: 100%;
 }
 
 // Phần văn bản bên trái và gợn sóng
@@ -154,6 +204,7 @@ $white-color: white;
     line-height: 1.5;
     color: #333;
   }
+  justify-content: center;
 }
 
 .about-subtitle {
@@ -181,7 +232,9 @@ $white-color: white;
 .about-image {
   flex: 1;
   text-align: right;
-
+  display: flex;
+  justify-content: center; // Căn giữa ảnh theo trục dọc
+  align-items: center;
   img {
     width: 400px;
     height: auto;
@@ -196,4 +249,230 @@ $white-color: white;
   height: 150px;
   background: repeating-linear-gradient(0deg, black 0%, black 10%, transparent 10%, transparent 20%);
   margin-left: 20px;
+}
+
+.follow-section {
+  text-align: center;
+  margin-top: 50px;
+  padding: 50px;
+
+  background-color: white;
+  width: 100%;
+
+  .header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 20px;
+
+    .follow-title {
+      font-size: 80px;
+      font-family: 'Monoton', Fantasy, sans-serif;
+      color: orange;
+    }
+
+    .insta-info {
+      text-align: right;
+
+      .insta-text {
+        font-size: 20px;
+        font-weight: bold;
+        color: black;
+      }
+
+      .black-bar {
+        width: 60px;
+        height: 8px;
+        background-color: black;
+        margin: 10px 0;
+      }
+
+      .insta-handle {
+        font-size: 16px;
+        color: blue;
+      }
+    }
+  }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Auto-fit and dynamically adjust columns */
+    gap: 20px; /* Space between images */
+    justify-content: center; /* Center the grid content */
+
+    .image-item {
+      max-width: 400px; /* Limit image width */
+      width: 100%;
+      height: auto;
+      position: relative;
+      overflow: hidden;
+
+      img {
+        width: 100%; /* Image takes full width of the container */
+        height: auto; /* Keep the aspect ratio */
+      }
+
+      /* Text and overlay on hover */
+      p {
+        position: absolute;
+        top: 50%; /* Position from the top */
+        left: 50%; /* Position from the left */
+        transform: translate(-50%, -50%); /* Center horizontally and vertically */
+        color: white;
+        font-size: 14px;
+        padding: 10px;
+        text-align: center;
+        opacity: 0; /* Hidden by default */
+        transition: opacity 0.3s ease-in-out; /* Smooth transition */
+      }
+
+      &:hover p {
+        opacity: 1; /* Text appears on hover */
+      }
+
+      &:hover img {
+        filter: brightness(0.7); /* Dim the image slightly on hover */
+      }
+    }
+  }
+
+  .load-more {
+    margin-top: 20px;
+    padding: 10px 30px;
+    background-color: black;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+
+    &:hover {
+      background-color: darkgray;
+    }
+  }
+}
+
+//PROCESS
+.process-cover {
+  background-color: white; /* Ensure the background is white */
+  width: 100vw; /* Set the width to full viewport width */
+  margin: 0; /* Remove margins */
+  padding: 50px 0; /* Add some padding at the top and bottom */
+  margin-top: 50px;
+
+  .process-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px; /* Set a maximum width for the content */
+    margin: 0 auto; /* Center the content */
+    padding: 0; /* Remove padding */
+
+    .process-item {
+      width: 33.33%;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+
+      img {
+        width: 100%;
+        max-height: 500px; /* Limit the image height */
+        object-fit: cover;
+        border-radius: 0;
+        margin: 0;
+      }
+
+      .process-text {
+        background-color: #3c2f2f;
+        padding: 15px;
+        color: #f8f0e3;
+        text-align: left;
+        margin: 0;
+        border-radius: 0;
+
+        h3 {
+          margin-bottom: 10px;
+          font-size: 22px;
+          font-family: 'Georgia', serif;
+          color: #f8f0e3;
+        }
+
+        p {
+          font-size: 14px;
+          line-height: 1.5;
+          margin: 0;
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+//CONTACT
+
+.contact-section {
+  background-color: #fff; /* White background */
+  padding: 50px 0;
+  width: 100%;
+  margin-top: 50px;
+
+  .contact-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto; /* Center the content */
+    padding: 0 20px;
+
+    .contact-info {
+      flex: 1;
+      background-color: white;
+      color: #3c2f2f;
+      padding: 20px;
+      text-align: left;
+
+      h2 {
+        font-size: 66px;
+        margin-bottom: 20px;
+        color: $purple-color;
+        font-family: $font-title;
+      }
+
+      p {
+        margin: 10px 0;
+      }
+
+      .contact-icons {
+        margin-top: 20px;
+
+        span {
+          font-size: 24px;
+          margin-right: 20px;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .contact-image {
+      flex: 1;
+      img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+//FOOTER
+// Footer Styles
+.footer-bottom {
+  background-color: #231f20; /* Darker shade for bottom */
+  padding: 20px 0;
+  text-align: center;
+  font-size: 22px;
+  color: #f8f0e3;
+  width: 100vw; /* Set width to full viewport width */
+  overflow-x: hidden; /* Hide horizontal overflow */
 }

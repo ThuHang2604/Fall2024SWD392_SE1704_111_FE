@@ -4,8 +4,8 @@ import imgHi from './img/womanhi.jpg';
 
 function About() {
   return (
-    <>
-      <div className="about-section">
+    <div className="about-section">
+      <div className="about-cover">
         <div className="about-content">
           <div className="about-text">
             <h2 className="about-title">ABOUT</h2>
@@ -27,7 +27,7 @@ function About() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
