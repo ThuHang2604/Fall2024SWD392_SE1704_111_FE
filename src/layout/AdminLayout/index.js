@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import PropTypes from 'prop-types';
@@ -73,8 +73,13 @@ function DashboardLayoutAccount(props) {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate('/login');
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const router = React.useMemo(() => {
     return {

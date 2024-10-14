@@ -1,21 +1,18 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import instance from '../axiosCustom';
 import { setUserAuthToken } from '../authServices';
+import { jwtDecode } from 'jwt-decode';
 
 export const loginUser = createAsyncThunk('auth/loginUser', async (credentials, { rejectWithValue }) => {
   try {
     const response = await instance.post('api/v1/users/Login', {
       username: credentials.username,
       password: credentials.password,
-      role: credentials.role,
     });
-    const { data } = response;
-    console.log('data role:', data);
-    if (data.status !== 1) {
-      return rejectWithValue('User account is inactive or banned');
-    }
+    const { data: token } = response; // API chỉ trả về token
+    console.log('data token:', token);
 
-    return data;
+    return token;
   } catch (error) {
     return rejectWithValue(error.response?.data || 'Login failed');
   }
@@ -73,13 +70,20 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isLoading = false;
 
-        // Set the user fields from the response
-        const { userId, userName, password, phone, status, role } = action.payload;
+        const token = action.payload;
 
-        // Store the user data in the state
-        state.user = { userId, userName, password, phone, status, role };
+        // Decode token để lấy thông tin người dùng
+        const decodedUser = jwtDecode(token);
+
+        state.user = {
+          role: decodedUser.role,
+        };
+        state.token = token;
         state.isAuthenticated = true;
         state.error = null;
+
+        // Lưu token vào localStorage hoặc header
+        setUserAuthToken(token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;

@@ -1,12 +1,15 @@
 import instance from './axiosCustom';
 
-const setUserAuthToken = (token) => {
+export const setUserAuthToken = (token) => {
   if (token) {
     instance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('authToken', token);
   } else {
     delete instance.defaults.headers.common['Authorization'];
+    localStorage.removeItem('authToken');
   }
 };
+
 function truncateText(text, maxLength) {
   if (text.length <= maxLength) {
     return text;
@@ -14,4 +17,3 @@ function truncateText(text, maxLength) {
   return text.substring(0, maxLength) + '...';
 }
 export default truncateText;
-export { setUserAuthToken };

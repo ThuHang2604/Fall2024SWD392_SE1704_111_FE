@@ -6,14 +6,17 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, logoutUser } from '../redux/slice/authSlice';
+import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
+import { loginUser } from '../redux/slice/authSlice';
 
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { isLoading, isAuthenticated, error, user } = useSelector((state) => state.auth);
+  // Lấy dữ liệu từ Redux store
+  const { isLoading, isAuthenticated, error, token } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
+  const [decodedToken, setDecodedToken] = useState(null); // State để lưu trữ JWT đã decode
 
   const INITIAL_FORM_STATE = {
     username: '',
@@ -29,34 +32,30 @@ function LoginPage() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmitLogin = async (values) => {
-    console.log('Login', values);
+  const handleSubmitLogin = (values) => {
     dispatch(loginUser(values));
   };
 
+  // Decode token và lưu trữ thông tin sau khi đăng nhập thành công
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/dashboard', { replace: true });
+    if (isAuthenticated && token) {
+      const decoded = jwtDecode(token);
+      setDecodedToken(decoded); // Lưu trữ token đã decode
+
+      // Điều hướng tới trang khác sau khi đăng nhập thành công dựa trên vai trò
+      if (decoded.role === 'Customer') {
+        navigate('/', { replace: true });
+      } else if (decoded.role === 'Staff' || decoded.role === 'Stylist') {
+        navigate('/dashboard');
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, token, navigate]);
 
   useEffect(() => {
     if (error) {
       toast.error(error);
     }
   }, [error]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      const role = user.role;
-
-      if (role === 1) {
-        navigate('/', { replace: true });
-      } else if (role >= 2 && role <= 5) {
-        navigate('/dashboard', { replace: true });
-      }
-    }
-  }, [isAuthenticated, navigate, user]);
 
   return (
     <Container maxWidth={false} disableGutters>
