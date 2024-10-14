@@ -7,7 +7,7 @@ import ServicePage from '@/pages/ServicePage';
 import ServiceDetail from '@/pages/ServiceDetail';
 import BookingPage from '@/pages/BookingPage';
 import PaymentPage from '@/pages/PaymentPage';
-import ServiceList from '@/pages/Manager/ServiceList';
+import ServiceList from '@/pages/Manager/ServiceListPage';
 
 const publicRoutes = [
   {
