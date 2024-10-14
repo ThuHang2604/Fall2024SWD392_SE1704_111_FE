@@ -1,23 +1,13 @@
-import React, { useState } from 'react';
-import { Box, Avatar, Typography, IconButton, Menu, MenuItem, Button } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import React from 'react';
+import { Box, Avatar, Typography, Button } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom'; // Use NavLink and useLocation for active state
 
 const ProfileSidebar = ({ user }) => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const location = useLocation(); // Get the current route
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -31,12 +21,13 @@ const ProfileSidebar = ({ user }) => {
         borderRadius: 2,
         padding: 3,
         textAlign: 'center',
-        position: 'relative',
         width: { xs: '100%', md: '30%' },
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         height: '100%',
+        maxWidth: '360px',
+        minWidth: '360px',
       }}
     >
       <Box
@@ -46,32 +37,60 @@ const ProfileSidebar = ({ user }) => {
           alignItems: 'center',
         }}
       >
-        <Box sx={{}}>
-          <Avatar
-            sx={{
-              width: 100,
-              height: 100,
-              backgroundColor: '#000',
-              border: '3px solid black',
-              borderRadius: '50%',
-            }}
-          />
-          <Typography variant="h6" mt={2}>
-            {user?.firstName} {user?.lastName} ({user?.role})
-          </Typography>
-        </Box>
+        <Avatar
+          sx={{
+            width: 100,
+            height: 100,
+            backgroundColor: '#000',
+            border: '3px solid black',
+            borderRadius: '50%',
+          }}
+        />
+        <Typography variant="h6" mt={2}>
+          {user?.firstName} {user?.lastName} ({user?.role})
+        </Typography>
 
         {/* Side Menu */}
         <Box sx={{ mt: 4 }}>
-          <Typography variant="body1" sx={{ mb: 2, cursor: 'pointer' }}>
-            My Bookings
-          </Typography>
-          <Typography variant="body1" sx={{ mb: 2, cursor: 'pointer' }}>
-            My Subscriptions
-          </Typography>
-          <Typography variant="body1" sx={{ color: 'red', cursor: 'pointer' }}>
+          {/* NavLink automatically adds "active" class when the route matches */}
+          <NavLink
+            to="/profile"
+            style={({ isActive }) => ({
+              display: 'block',
+              marginBottom: '16px',
+              color: isActive ? 'red' : 'inherit',
+              cursor: 'pointer',
+              textDecoration: 'none',
+            })}
+          >
             My Account
-          </Typography>
+          </NavLink>
+
+          <NavLink
+            to="/subscriptions"
+            style={({ isActive }) => ({
+              display: 'block',
+              marginBottom: '16px',
+              color: isActive ? 'red' : 'inherit',
+              cursor: 'pointer',
+              textDecoration: 'none',
+            })}
+          >
+            My Subscriptions
+          </NavLink>
+
+          <NavLink
+            to="/booking"
+            style={({ isActive }) => ({
+              display: 'block',
+              marginBottom: '16px',
+              color: isActive ? 'red' : 'inherit',
+              cursor: 'pointer',
+              textDecoration: 'none',
+            })}
+          >
+            My Bookings
+          </NavLink>
         </Box>
       </Box>
 
