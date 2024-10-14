@@ -8,7 +8,7 @@ import ServiceDetail from '@/pages/ServiceDetail';
 import BookingPage from '@/pages/BookingPage';
 import PaymentPage from '@/pages/PaymentPage';
 import ServiceList from '@/pages/Manager/ServiceListPage';
-
+import ProfilePage from '@/pages/UserProfile/Profile';
 const publicRoutes = [
   {
     title: 'Home',
@@ -44,6 +44,11 @@ const publicRoutes = [
     title: 'BookingPage',
     path: '/booking-page',
     component: BookingPage,
+  },
+  {
+    title: 'Profile',
+    path: '/profile',
+    component: ProfilePage,
   },
 ];
 

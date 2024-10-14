@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, IconButton, Box, Button } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box, Button, Menu, MenuItem } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
-import useRole from '../../hooks/useRole';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -15,7 +14,17 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate('/');
+    navigate('/login');
+  };
+
+  // State để quản lý menu dropdown của avatar
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
@@ -52,13 +61,10 @@ const Navbar = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {isAuthenticated ? (
             <>
-              {/* Admin, Staff, Stylist, Manager: Show Dashboard */}
-              {(role === 5 || role === 4 || role === 3 || role === 2) && <></>}
-
               {/* Customer: Show Account & Cart */}
-              {role === 1 && (
+              {role === 'Customer' && (
                 <>
-                  <IconButton sx={{ color: 'black' }}>
+                  <IconButton sx={{ color: 'black' }} onClick={handleClick}>
                     <AccountCircleIcon />
                   </IconButton>
                   <IconButton sx={{ color: 'black', position: 'relative' }}>
@@ -85,19 +91,25 @@ const Navbar = () => {
                 </>
               )}
 
-              {/* Log Out Button for All Roles */}
-              <Button
-                onClick={handleLogout}
-                sx={{
-                  color: 'black',
-                  fontSize: '16px',
-                  letterSpacing: '1.5px',
-                  fontWeight: 'bold',
-                  textTransform: 'none',
+              {/* Avatar Menu */}
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
                 }}
               >
-                Log Out
-              </Button>
+                <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                  Profile
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>Log Out</MenuItem>
+              </Menu>
             </>
           ) : (
             <div>
