@@ -4,7 +4,6 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import RegisterPage from '@/pages/RegisterPage';
 import Dashboard from '@/pages/Manager/Dashboard';
 import ServicePage from '@/pages/ServicePage';
-import ServiceDetail from '@/pages/ServiceDetail';
 import BookingPage from '@/pages/BookingPage';
 import PaymentPage from '@/pages/PaymentPage';
 import ServiceList from '@/pages/Manager/ServiceListPage';
@@ -35,11 +34,6 @@ const publicRoutes = [
     title: 'ServicePage',
     path: '/service-page',
     component: ServicePage,
-  },
-  {
-    title: 'ServiceDetail',
-    path: '/service-detail',
-    component: ServiceDetail,
   },
   {
     title: 'BookingPage',
