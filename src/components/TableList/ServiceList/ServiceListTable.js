@@ -34,7 +34,7 @@ function ServiceListTable({ serviceList }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - serviceList.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - serviceList?.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -69,9 +69,9 @@ function ServiceListTable({ serviceList }) {
         </TableHead>
         <TableBody>
           {(rowsPerPage > 0
-            ? serviceList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            ? serviceList?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             : serviceList
-          ).map((service) => (
+          )?.map((service) => (
             <StyledTableRow key={service.serviceId}>
               <StyledTableCell component="th" scope="row">
                 {service.serviceId}
@@ -110,7 +110,7 @@ function ServiceListTable({ serviceList }) {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
               colSpan={11}
-              count={serviceList.length}
+              count={serviceList?.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
