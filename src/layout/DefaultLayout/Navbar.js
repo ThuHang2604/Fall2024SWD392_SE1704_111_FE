@@ -55,6 +55,12 @@ const Navbar = () => {
           >
             SERVICES
           </Button>
+          <Button
+            onClick={handleLogout}
+            sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
+          >
+            Log out
+          </Button>
         </Box>
 
         {/* User Account & Cart */}
