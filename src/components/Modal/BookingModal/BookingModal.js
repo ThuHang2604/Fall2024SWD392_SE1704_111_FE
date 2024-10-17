@@ -1,17 +1,67 @@
-import React from 'react';
-import { Button, Modal, Select, MenuItem, Box } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Button, Modal, Select, MenuItem, Box, Typography } from '@mui/material';
 import './styles.css';
+import { getServiceDetail } from '@/api/ServiceApi';
+import { getStylistByServiceID } from '@/api/StylistApi';
 
-const BookingModal = ({ open, onClose }) => {
-  const [stylist, setStylist] = React.useState('');
+const BookingModal = ({ open, onClose, serviceId }) => {
+  const [stylists, setStylists] = useState([]);
+  const [selectedStylist, setSelectedStylist] = useState('');
+  const [serviceDetail, setServiceDetail] = useState({});
+  const [isFetched, setIsFetched] = useState(false);
+
+  useEffect(() => {
+    if (serviceId && open && !isFetched) {
+      const fetchStylists = async () => {
+        try {
+          const response = await getStylistByServiceID(serviceId);
+          if (response.status === 1) {
+            setStylists(response.data);
+          } else {
+            console.error('Failed to fetch stylists:', response.message);
+          }
+        } catch (error) {
+          console.error('Failed to fetch stylists:', error);
+        }
+      };
+
+      const fetchServiceDetail = async () => {
+        try {
+          const detailResponse = await getServiceDetail(serviceId);
+          if (detailResponse.status === 1) {
+            setServiceDetail(detailResponse.data);
+          } else {
+            console.error('Failed to fetch service details:', detailResponse.message);
+          }
+        } catch (error) {
+          console.error('Failed to fetch service details:', error);
+        }
+      };
+
+      fetchStylists();
+      fetchServiceDetail();
+      setIsFetched(true);
+    }
+  }, [serviceId, open, isFetched]);
 
   const handleClose = () => {
     onClose();
-    setStylist('');
+    setSelectedStylist('');
+    setIsFetched(false);
   };
 
-  const handleChange = (event) => {
-    setStylist(event.target.value);
+  const handleChangeStylist = (event) => {
+    setSelectedStylist(event.target.value);
+  };
+
+  const handleAddToCart = () => {
+    const bookingData = {
+      serviceId: serviceId,
+      stylistId: selectedStylist,
+    };
+    localStorage.setItem('booking-cart', JSON.stringify(bookingData));
+    console.log('Booking data saved to local storage:', bookingData);
+    handleClose();
   };
 
   return (
@@ -26,18 +76,42 @@ const BookingModal = ({ open, onClose }) => {
       }}
     >
       <Box className="modal-box">
-        <h2>Select Your Stylist</h2>
-        <Select value={stylist} onChange={handleChange} className="full-width">
-          <MenuItem value={'Joy'}>Joy</MenuItem>
-          {/* Thêm các option khác cho stylist ở đây */}
-        </Select>
-        {/* serviceName",price,estimateTime lấy bằng Api */}
-        <div className="mt-2">
-          <p>Silk Press</p>
-          <p>45 min • $30</p>
-        </div>
-        {/* ----------------------------- */}
-        <Button variant="contained" color="primary" className="full-width" onClick={handleClose}>
+        <Typography variant="h6" sx={{ marginBottom: 2 }}>
+          Select Your Stylist
+        </Typography>
+
+        {/* Hiển thị thông tin dịch vụ */}
+        <Box sx={{ marginTop: 2, marginBottom: 2 }}>
+          <Typography variant="body1">{serviceDetail.serviceName || 'Loading...'}</Typography>
+          <Typography variant="body2">
+            {serviceDetail.estimateTime ? `${serviceDetail.estimateTime} • $${serviceDetail.price}` : 'Loading...'}
+          </Typography>
+        </Box>
+
+        {/* Dropdown cho stylist */}
+        {stylists.length > 0 ? (
+          <Select value={selectedStylist} onChange={handleChangeStylist} className="full-width" displayEmpty>
+            <MenuItem value="" disabled>
+              Select a stylist
+            </MenuItem>
+            {stylists.map((stylist) => (
+              <MenuItem key={stylist.stylistId} value={stylist.stylistId}>
+                {stylist.stylistName}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <Typography>No stylists available</Typography>
+        )}
+
+        <Button
+          variant="contained"
+          color="primary"
+          className="full-width"
+          onClick={handleAddToCart}
+          disabled={!selectedStylist}
+          sx={{ marginTop: 2 }}
+        >
           Add To Cart
         </Button>
       </Box>

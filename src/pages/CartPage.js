@@ -1,6 +1,6 @@
 import React from 'react';
 
-function BookingPage() {
+function CartPage() {
   return (
     <>
       <h1>Booking Page</h1>
@@ -9,4 +9,4 @@ function BookingPage() {
   );
 }
 
-export default BookingPage;
+export default CartPage;

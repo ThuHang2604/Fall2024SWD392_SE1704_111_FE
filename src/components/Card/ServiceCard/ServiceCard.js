@@ -4,15 +4,17 @@ import { Grid } from '@mui/material';
 import BookingModal from '@/components/Modal/BookingModal/BookingModal';
 
 function ServiceCard({ serviceCard }) {
-  //BookingModalHandle
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState(null); // Lưu id của service được chọn
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (serviceId) => {
+    setSelectedServiceId(serviceId);
     setModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setModalOpen(false);
+    setSelectedServiceId(null);
   };
 
   return (
@@ -20,24 +22,21 @@ function ServiceCard({ serviceCard }) {
       <Grid container spacing={3}>
         {serviceCard.map((service) => (
           <Grid item xs={12} sm={6} md={4} key={service.serviceName}>
-            {' '}
-            {/* Use service.serviceName as the key */}
             <Card>
-              <CardMedia component="img" height="140" image={service.imageLink} alt={service.serviceName} />{' '}
-              {/* Corrected to service.serviceName */}
+              <CardMedia component="img" height="140" image={service.imageLink} alt={service.serviceName} />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
-                  {service.serviceName} {/* Corrected to service.serviceName */}
+                  {service.serviceName}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
                   {service.description}
                 </Typography>
                 <Typography variant="body2">
-                  {service.estimateTime} | ${service.price}
+                  {service.estimateTime} min | ${service.price}
                 </Typography>
                 <div>
-                  <Button onClick={handleOpenModal}>Book Now</Button>
-                  <BookingModal open={modalOpen} onClose={handleCloseModal} />
+                  <Button onClick={() => handleOpenModal(service.serviceId)}>Book Now</Button>
+                  <BookingModal open={modalOpen} onClose={handleCloseModal} serviceId={selectedServiceId} />
                 </div>
               </CardContent>
             </Card>
