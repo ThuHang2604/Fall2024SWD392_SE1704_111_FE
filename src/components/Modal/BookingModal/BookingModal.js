@@ -31,10 +31,12 @@ const BookingModal = ({ open, onClose }) => {
           <MenuItem value={'Joy'}>Joy</MenuItem>
           {/* Thêm các option khác cho stylist ở đây */}
         </Select>
+        {/* serviceName",price,estimateTime lấy bằng Api */}
         <div className="mt-2">
           <p>Silk Press</p>
           <p>45 min • $30</p>
         </div>
+        {/* ----------------------------- */}
         <Button variant="contained" color="primary" className="full-width" onClick={handleClose}>
           Add To Cart
         </Button>
