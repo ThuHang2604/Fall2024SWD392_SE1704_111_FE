@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import ServiceCardView from '@/components/Card/ServiceCard/ServiceCardView';
-import { getAllServices } from '@/api/ServiceApi';
 import { Pagination, Box } from '@mui/material';
+import { getAllServices } from '@/api/ServiceApi';
+import ServiceCardView from '@/components/Card/ServiceCard/ServiceCardView';
 
 function ServicePage() {
   const [serviceCard, setServiceCard] = useState([]); // All services

@@ -1,8 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Button } from '@mui/material';
 import { Grid } from '@mui/material';
+import BookingModal from '@/components/Modal/BookingModal/BookingModal';
 
 function ServiceCard({ serviceCard }) {
+  //BookingModalHandle
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+
   return (
     <Container>
       <Grid container spacing={3}>
@@ -23,9 +35,10 @@ function ServiceCard({ serviceCard }) {
                 <Typography variant="body2">
                   {service.estimateTime} | ${service.price}
                 </Typography>
-                <Button variant="contained" color="primary" fullWidth>
-                  BOOK NOW
-                </Button>
+                <div>
+                  <Button onClick={handleOpenModal}>Book Now</Button>
+                  <BookingModal open={modalOpen} onClose={handleCloseModal} />
+                </div>
               </CardContent>
             </Card>
           </Grid>
