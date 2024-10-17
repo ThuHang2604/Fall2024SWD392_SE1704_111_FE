@@ -4,7 +4,7 @@ import './styles.css';
 import { getServiceDetail } from '@/api/ServiceApi';
 import { getStylistByServiceID } from '@/api/StylistApi';
 
-const BookingModal = ({ open, onClose, serviceId }) => {
+const BookingModal = ({ open, onClose, serviceId, onNext = () => {} }) => {
   const [stylists, setStylists] = useState([]);
   const [selectedStylist, setSelectedStylist] = useState('');
   const [serviceDetail, setServiceDetail] = useState({});
@@ -54,14 +54,12 @@ const BookingModal = ({ open, onClose, serviceId }) => {
     setSelectedStylist(event.target.value);
   };
 
-  const handleAddToCart = () => {
+  const handleNext = () => {
     const bookingData = {
-      serviceId: serviceId,
-      stylistId: selectedStylist,
+      serviceDetail,
+      selectedStylist,
     };
-    localStorage.setItem('booking-cart', JSON.stringify(bookingData));
-    console.log('Booking data saved to local storage:', bookingData);
-    handleClose();
+    onNext(bookingData); // Ensure onNext is always a valid function
   };
 
   return (
@@ -80,7 +78,6 @@ const BookingModal = ({ open, onClose, serviceId }) => {
           Select Your Stylist
         </Typography>
 
-        {/* Hiển thị thông tin dịch vụ */}
         <Box sx={{ marginTop: 2, marginBottom: 2 }}>
           <Typography variant="body1">{serviceDetail.serviceName || 'Loading...'}</Typography>
           <Typography variant="body2">
@@ -88,7 +85,6 @@ const BookingModal = ({ open, onClose, serviceId }) => {
           </Typography>
         </Box>
 
-        {/* Dropdown cho stylist */}
         {stylists.length > 0 ? (
           <Select value={selectedStylist} onChange={handleChangeStylist} className="full-width" displayEmpty>
             <MenuItem value="" disabled>
@@ -108,11 +104,11 @@ const BookingModal = ({ open, onClose, serviceId }) => {
           variant="contained"
           color="primary"
           className="full-width"
-          onClick={handleAddToCart}
+          onClick={handleNext}
           disabled={!selectedStylist}
           sx={{ marginTop: 2 }}
         >
-          Add To Cart
+          Next
         </Button>
       </Box>
     </Modal>
