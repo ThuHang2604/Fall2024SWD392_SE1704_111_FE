@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Container, Typography, TextField, Button } from '@mui/material';
+import { Box, Container, Typography, TextField, Button, Backdrop, CircularProgress } from '@mui/material';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 import ProfileSidebar from './ProSidebar';
-import { getUserProfile, updateCurrentProfile } from '@/redux/slice/authSlice';
+import { getUserProfileCurrent, updateCurrentProfile } from '@/redux/slice/userProfileSlice';
+import { loginUser } from '@/redux/slice/authSlice';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { imageDb } from '@/components/FirebaseImage/Config';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
+  const { user, isLoading, error } = useSelector((state) => state.userProfile);
+  const { role } = useSelector((state) => state.auth);
+  console.log('role là :', role);
   const [formData, setFormData] = useState({
     imageLink: '',
     fullName: '',
@@ -19,8 +23,12 @@ const ProfilePage = () => {
     phone: '',
   });
 
+  const [previewImage, setPreviewImage] = useState('');
+  const [loading, setLoading] = useState(false); // State cho loading
+
   useEffect(() => {
-    dispatch(getUserProfile());
+    dispatch(getUserProfileCurrent());
+    dispatch(loginUser());
   }, [dispatch]);
 
   useEffect(() => {
@@ -34,22 +42,13 @@ const ProfilePage = () => {
         dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
         phone: user.phone || '',
       });
+      setPreviewImage(user.imageLink || '');
     }
   }, [user]);
 
-  const handleImageChange = (image) => {
-    setFormData((prev) => ({
-      ...prev,
-      imageLink: image,
-    }));
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageUpload = (e) => {
@@ -59,19 +58,18 @@ const ProfilePage = () => {
     const storageRef = ref(imageDb, `Image/UserProfile/${selectedImage.name}`);
     const uploadTask = uploadBytesResumable(storageRef, selectedImage);
 
+    const imagePreviewUrl = URL.createObjectURL(selectedImage);
+    setPreviewImage(imagePreviewUrl);
+
     uploadTask.on(
       'state_changed',
-      (snapshot) => {
-        // You can handle progress here if needed
-      },
+      (snapshot) => {},
       (error) => {
         console.error('Image upload failed:', error);
       },
       () => {
-        // Get the download URL when the upload is complete
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log('File available at', downloadURL);
-          handleImageChange(downloadURL); // Pass the image URL to the form data
+          setFormData((prev) => ({ ...prev, imageLink: downloadURL }));
         });
       },
     );
@@ -79,30 +77,52 @@ const ProfilePage = () => {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const actionResult = await dispatch(updateCurrentProfile(formData));
+
       if (updateCurrentProfile.fulfilled.match(actionResult)) {
-        setFormData((prev) => ({
-          ...prev,
-          ...actionResult.payload,
-        }));
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Profile updated successfully!',
+        });
+        dispatch(getUserProfileCurrent());
       } else {
-        console.error('Update failed:', actionResult.error.message);
+        if (actionResult.error.message.includes('401')) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Unauthorized',
+            text: 'Your session has expired. Please log in again.',
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Update failed: ' + actionResult.error.message,
+          });
+        }
       }
     } catch (error) {
-      console.error('Error updating profile:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'An error occurred during profile update.',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (isLoading) return <CircularProgress />;
+
   return (
     <Container maxWidth={false} sx={{ mt: 4, maxWidth: '1400px' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          gap: '30px',
-          flexDirection: { xs: 'column', md: 'row' },
-        }}
-      >
-        <ProfileSidebar user={user} onImageChange={handleImageChange} />
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      <Box sx={{ display: 'flex', gap: '30px', flexDirection: { xs: 'column', md: 'row' } }}>
+        <ProfileSidebar user={user} previewImage={previewImage} role={role} />
 
         <Box
           sx={{
@@ -113,28 +133,11 @@ const ProfilePage = () => {
             textAlign: 'left',
           }}
         >
-          {/* Account Title */}
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 'bold',
-              mb: 3,
-              color: '#f26e3f',
-              fontFamily: 'Monoton, Fantasy',
-            }}
-          >
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#f26e3f', fontFamily: 'Monoton, Fantasy' }}>
             ACCOUNT
           </Typography>
           <Typography variant="body2" mb={2}>
             View and edit your personal info below.
-          </Typography>
-
-          {/* Personal Info Section */}
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
-            PERSONAL INFO
-          </Typography>
-          <Typography variant="body2" mb={2}>
-            Update your personal information.
           </Typography>
 
           <Box sx={{ display: 'flex', gap: '20px', flexDirection: { xs: 'column', sm: 'row' }, mb: 2 }}>
@@ -173,9 +176,7 @@ const ProfilePage = () => {
               value={formData.gender}
               onChange={handleChange}
               sx={{ mt: 2 }}
-              SelectProps={{
-                native: true,
-              }}
+              SelectProps={{ native: true }}
             >
               <option value={0}>Male</option>
               <option value={1}>Female</option>
@@ -203,19 +204,20 @@ const ProfilePage = () => {
             />
           </Box>
 
-          {/* Image Upload Section */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
             <input type="file" accept="image/*" onChange={handleImageUpload} />
-            {/* <Button variant="contained" sx={{ backgroundColor: '#000', color: '#fff' }}>
-              Upload Image
-            </Button> */}
           </Box>
 
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 3 }}>
             <Button variant="outlined" sx={{ color: '#f26e3f', borderColor: '#f26e3f' }}>
               Discard
             </Button>
-            <Button variant="contained" sx={{ backgroundColor: '#000', color: '#fff' }} onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              sx={{ backgroundColor: '#000', color: '#fff' }}
+              onClick={handleSubmit}
+              disabled={loading}
+            >
               Update Info
             </Button>
           </Box>
