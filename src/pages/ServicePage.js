@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Pagination, Box } from '@mui/material';
 import { getAllServices } from '@/api/ServiceApi';
 import ServiceCardView from '@/components/Card/ServiceCard/ServiceCardView';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ServicePage() {
   const [serviceCard, setServiceCard] = useState([]); // All services
@@ -60,6 +62,7 @@ function ServicePage() {
           </Box>
         </>
       )}
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 }

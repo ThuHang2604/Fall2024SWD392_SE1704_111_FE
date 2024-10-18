@@ -28,7 +28,7 @@ const CartModal = ({ open, onClose, bookingData }) => {
     const dataToSave = {
       userName,
       phone,
-      voucherId: 0,
+      voucherId: null,
       scheduleId: schedule,
       serviceId: [bookingData.serviceDetail.serviceId],
       stylistId: [bookingData.selectedStylist],
