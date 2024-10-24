@@ -15,9 +15,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
+    fontSize: 18,
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+    fontSize: 16,
   },
 }));
 
@@ -31,7 +32,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 function ServiceListTable({ serviceList = [] }) {
-  // Default value to an empty array
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -69,7 +69,7 @@ function ServiceListTable({ serviceList = [] }) {
           </TableRow>
         </TableHead>
         <TableBody>
-          {serviceList.length > 0 ? ( // Check if serviceList is not empty
+          {serviceList.length > 0 ? (
             (rowsPerPage > 0
               ? serviceList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               : serviceList
@@ -124,6 +124,15 @@ function ServiceListTable({ serviceList = [] }) {
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{
+                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select, & .MuiTablePagination-menuItem':
+                  {
+                    fontSize: '16px',
+                  },
+                '& .MuiTablePagination-actions': {
+                  fontSize: '16px',
+                },
+              }}
             />
           </TableRow>
         </TableFooter>

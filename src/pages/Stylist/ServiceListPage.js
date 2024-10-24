@@ -8,25 +8,12 @@ function ServiceListPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // useEffect(() => {
-  //   const fetchServices = async () => {
-  //     try {
-  //       const data = await getAllServices();
-  //       setServiceList(data.items);
-  //     } catch (error) {
-  //       setError(error);
-  //     }
-  //   };
-
-  //   fetchServices();
-  // }, []);
-
   useEffect(() => {
     const fetchServices = async () => {
       try {
-        const response = await getAllServices(); // Fetch all services at once
-        const data = response?.data || []; // Ensure response.data is defined
-        setServiceList(data); // Save all services to state
+        const response = await getAllServices();
+        const data = response?.data || [];
+        setServiceList(data);
       } catch (error) {
         setError('Failed to fetch services. Please try again later.');
       }
