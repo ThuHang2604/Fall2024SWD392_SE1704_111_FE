@@ -9,6 +9,7 @@ import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import ReportIcon from '@mui/icons-material/Report';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
@@ -19,6 +20,12 @@ const NAVIGATION = [
     title: 'Dashboard',
     icon: <DashboardIcon />,
     onClick: (navigate) => navigate('/dashboard'),
+  },
+  {
+    segment: 'report-list',
+    title: 'Report List',
+    icon: <ReportIcon />,
+    onClick: (navigate) => navigate('/report-list'),
   },
   {
     segment: 'service-list',

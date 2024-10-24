@@ -2,13 +2,15 @@ import HomePage from '@/pages/home/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import ForgotPassword from '@/pages/ForgotPassword';
 import RegisterPage from '@/pages/RegisterPage';
-import Dashboard from '@/pages/Manager/Dashboard';
+import Dashboard from '@/pages/Stylist/Dashboard';
 import ServicePage from '@/pages/ServicePage';
 import CartPage from '@/pages/CartPage';
 import PaymentPage from '@/pages/PaymentPage';
-import ServiceList from '@/pages/Manager/ServiceListPage';
+import ServiceList from '@/pages/Stylist/ServiceListPage';
 import ProfilePage from '@/pages/UserProfile/Profile';
 import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
+import ReportListPage from '@/pages/Stylist/ReportListPage';
+
 const publicRoutes = [
   {
     title: 'Home',
@@ -69,6 +71,11 @@ const adminRoutes = [
   {
     title: 'Service List',
     path: '/service-list',
+    component: ServiceList,
+  },
+  {
+    title: 'Report List',
+    path: '/report-list',
     component: ServiceList,
   },
 ];
