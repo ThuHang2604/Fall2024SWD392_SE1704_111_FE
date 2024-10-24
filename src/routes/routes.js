@@ -76,7 +76,7 @@ const adminRoutes = [
   {
     title: 'Report List',
     path: '/report-list',
-    component: ServiceList,
+    component: ReportListPage,
   },
 ];
 
