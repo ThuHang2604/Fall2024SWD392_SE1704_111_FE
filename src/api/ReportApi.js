@@ -1,6 +1,5 @@
 import axios from './axios';
 
-// Hàm lấy danh sách tất cả báo cáo
 const getAllReport = async () => {
   try {
     const response = await axios.get('api/v1/reports/reportList', {
@@ -14,7 +13,6 @@ const getAllReport = async () => {
   }
 };
 
-// Hàm tạo báo cáo mới
 const createReport = async (reportData) => {
   try {
     const response = await axios.post('api/v1/reports/createReport', reportData, {
@@ -29,7 +27,6 @@ const createReport = async (reportData) => {
   }
 };
 
-// Hàm cập nhật báo cáo theo reportId
 const updateReport = async (reportId, reportData) => {
   try {
     const response = await axios.post(`api/v1/reports/updateReport/${reportId}`, reportData, {
