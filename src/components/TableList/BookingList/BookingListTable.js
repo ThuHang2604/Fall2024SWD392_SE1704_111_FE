@@ -35,7 +35,7 @@ function BookingListTable({ bookingList = [] }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bookingList.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bookingList?.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -51,7 +51,17 @@ function BookingListTable({ bookingList = [] }) {
       <Table sx={{ minWidth: 700 }} aria-label="booking table">
         <TableHead>
           <TableRow>
-            {['Booking ID', 'Customer Name', 'Service', 'Date', 'Status', 'Actions'].map((header) => (
+            {[
+              'Booking ID',
+              'Total Price',
+              'Voucher ID',
+              'Customer ID',
+              'Staff ID',
+              'Schedule ID',
+              'Status',
+              'Create Date',
+              'Actions',
+            ].map((header) => (
               <StyledTableCell key={header}>{header}</StyledTableCell>
             ))}
           </TableRow>
@@ -61,13 +71,16 @@ function BookingListTable({ bookingList = [] }) {
             (rowsPerPage > 0
               ? bookingList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               : bookingList
-            ).map((booking, index) => (
-              <StyledTableRow key={index}>
+            ).map((booking) => (
+              <StyledTableRow key={booking.bookingId}>
                 <StyledTableCell>{booking.bookingId}</StyledTableCell>
-                <StyledTableCell>{booking.customerName}</StyledTableCell>
-                <StyledTableCell>{booking.serviceName}</StyledTableCell>
-                <StyledTableCell>{new Date(booking.date).toLocaleDateString()}</StyledTableCell>
+                <StyledTableCell>{booking.totalPrice}</StyledTableCell>
+                <StyledTableCell>{booking.voucherId || 'N/A'}</StyledTableCell>
+                <StyledTableCell>{booking.customerId}</StyledTableCell>
+                <StyledTableCell>{booking.staffId}</StyledTableCell>
+                <StyledTableCell>{booking.scheduleId}</StyledTableCell>
                 <StyledTableCell>{booking.status}</StyledTableCell>
+                <StyledTableCell>{new Date(booking.createDate).toLocaleString()}</StyledTableCell>
                 <StyledTableCell>
                   <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
                     Update
@@ -80,14 +93,14 @@ function BookingListTable({ bookingList = [] }) {
             ))
           ) : (
             <TableRow>
-              <StyledTableCell colSpan={6} align="center">
+              <StyledTableCell colSpan={8} align="center">
                 No bookings found.
               </StyledTableCell>
             </TableRow>
           )}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <StyledTableCell colSpan={6} />
+              <StyledTableCell colSpan={8} />
             </TableRow>
           )}
         </TableBody>
@@ -95,12 +108,21 @@ function BookingListTable({ bookingList = [] }) {
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={6}
-              count={bookingList.length}
+              colSpan={8}
+              count={bookingList?.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
+              sx={{
+                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select, & .MuiTablePagination-menuItem':
+                  {
+                    fontSize: '16px',
+                  },
+                '& .MuiTablePagination-actions': {
+                  fontSize: '16px',
+                },
+              }}
             />
           </TableRow>
         </TableFooter>

@@ -13,9 +13,9 @@ const createBooking = async (bookingData) => {
   }
 };
 
-const getBookingList = async (pageNumber = 1, pageSize = 10) => {
+const getBookingList = async () => {
   try {
-    const response = await axios.get(`api/v1/booking?page=${pageNumber}&pageSize=${pageSize}`);
+    const response = await axios.get(`api/v1/booking/bookingList`);
     return response.data;
   } catch (error) {
     throw error;
