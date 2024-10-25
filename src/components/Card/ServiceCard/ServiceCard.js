@@ -3,7 +3,8 @@ import { Container, Typography, Card, CardContent, CardMedia, Button } from '@mu
 import { Grid } from '@mui/material';
 import BookingModal from '@/components/Modal/BookingModal/BookingModal';
 import CartModal from '@/components/Modal/CartModal/CartModal';
-
+import FinalScheduleModal from '@/components/Card/ServiceCard/FinalScheduleModal';
+import { Hair } from '@/pages/home/img/hair.jpg';
 function ServiceCard({ serviceCard }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedServiceId, setSelectedServiceId] = useState(null); // Lưu id của service được chọn
