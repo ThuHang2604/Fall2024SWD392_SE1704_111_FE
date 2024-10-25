@@ -13,4 +13,13 @@ const createBooking = async (bookingData) => {
   }
 };
 
-export { createBooking };
+const getBookingList = async (pageNumber = 1, pageSize = 10) => {
+  try {
+    const response = await axios.get(`api/v1/booking?page=${pageNumber}&pageSize=${pageSize}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { createBooking, getBookingList };

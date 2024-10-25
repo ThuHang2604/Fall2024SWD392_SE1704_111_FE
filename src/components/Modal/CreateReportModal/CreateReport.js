@@ -31,7 +31,7 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
       const response = await createReport(reportData);
       if (response.status === 1) {
         console.log('Report created successfully:', response.data);
-        onSuccess(response.data); // Callback sau khi tạo báo cáo thành công
+        onSuccess(response.data);
       } else {
         console.error('Failed to create report:', response.message);
       }
@@ -39,7 +39,7 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
       console.error('Error creating report:', error);
     } finally {
       setIsSubmitting(false);
-      handleClose(); // Đóng modal sau khi xử lý
+      handleClose();
     }
   };
 
