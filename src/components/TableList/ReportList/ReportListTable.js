@@ -51,16 +51,19 @@ function ReportListTable({ reportList = [] }) {
       <Table sx={{ minWidth: 700 }} aria-label="report table">
         <TableHead>
           <TableRow>
-            {['Report Name', 'Report Link', 'Status', 'Create By', 'Update By', 'Actions'].map((header) => (
-              <StyledTableCell key={header}>{header}</StyledTableCell>
-            ))}
+            {['Report ID', 'Report Name', 'Report Link', 'Status', 'Create By', 'Update By', 'Actions'].map(
+              (header) => (
+                <StyledTableCell key={header}>{header}</StyledTableCell>
+              ),
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
           {reportList.length > 0 ? (
             (rowsPerPage > 0 ? reportList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage) : reportList).map(
-              (report, index) => (
-                <StyledTableRow key={index}>
+              (report) => (
+                <StyledTableRow key={report.reportId}>
+                  <StyledTableCell>{report.reportId}</StyledTableCell> {/* Thêm dòng này để hiển thị reportId */}
                   <StyledTableCell>{report.reportName}</StyledTableCell>
                   <StyledTableCell>
                     <a href={report.reportLink} target="_blank" rel="noopener noreferrer">
@@ -83,14 +86,14 @@ function ReportListTable({ reportList = [] }) {
             )
           ) : (
             <TableRow>
-              <StyledTableCell colSpan={6} align="center">
+              <StyledTableCell colSpan={7} align="center">
                 No reports found.
               </StyledTableCell>
             </TableRow>
           )}
           {emptyRows > 0 && (
             <TableRow style={{ height: 53 * emptyRows }}>
-              <StyledTableCell colSpan={6} />
+              <StyledTableCell colSpan={7} />
             </TableRow>
           )}
         </TableBody>
@@ -98,7 +101,7 @@ function ReportListTable({ reportList = [] }) {
           <TableRow>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={6}
+              colSpan={7}
               count={reportList?.length}
               rowsPerPage={rowsPerPage}
               page={page}
