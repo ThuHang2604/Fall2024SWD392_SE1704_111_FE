@@ -52,6 +52,7 @@ const updateReport = async (reportId, reportData) => {
 const removeReport = async (reportId, status) => {
   try {
     const token = Cookies.get('authToken'); // Lấy token từ Cookies
+    console.log('token', token);
 
     const response = await axios.post(
       `api/v1/reports/changeReportStatus/${reportId}`,

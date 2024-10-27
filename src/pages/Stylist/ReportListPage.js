@@ -8,17 +8,17 @@ function ReportListPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const response = await getAllReport();
-        const data = response?.data || [];
-        setReportList(data);
-      } catch (error) {
-        setError('Failed to fetch reports. Please try again later.');
-      }
-    };
+  const fetchReports = async () => {
+    try {
+      const response = await getAllReport();
+      const data = response?.data || [];
+      setReportList(data);
+    } catch (error) {
+      setError('Failed to fetch reports. Please try again later.');
+    }
+  };
 
+  useEffect(() => {
     fetchReports();
   }, []);
 
@@ -39,6 +39,7 @@ function ReportListPage() {
       handleChangePage={handleChangePage}
       handleChangeRowsPerPage={handleChangeRowsPerPage}
       error={error}
+      onRefresh={fetchReports} // Truyền fetchReports xuống để dùng làm onRefresh
     />
   );
 }
