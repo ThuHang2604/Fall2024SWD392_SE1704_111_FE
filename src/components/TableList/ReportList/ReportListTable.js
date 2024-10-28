@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { styled } from '@mui/material/styles';
@@ -14,6 +15,7 @@ import TablePagination from '@mui/material/TablePagination';
 import Button from '@mui/material/Button';
 import { removeReport } from '@/api/ReportApi';
 import ConfirmRemoveDialog from '@/components/Modal/DialogConfirm/ComfirmRemove';
+import UpdateReportModal from '@/components/Modal/ReportModal/UpdateReport';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -39,7 +41,9 @@ function ReportListTable({ reportList = [], onRefresh }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState(null);
+  const [selectedReport, setSelectedReport] = useState(null);
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reportList?.length) : 0;
 
@@ -76,22 +80,23 @@ function ReportListTable({ reportList = [], onRefresh }) {
     }
   };
 
-  // const handleRemoveReport = (reportId) => {
-  //   if (window.confirm('Are you sure you want to remove this report?')) {
-  //     removeReport(reportId, 0)
-  //       .then(() => {
-  //         toast.success('Report removed successfully!');
-  //         onRefresh(); // Gọi lại hàm refresh sau khi xóa
-  //       })
-  //       .catch((error) => {
-  //         toast.error(`Error removing report: ${error.message}`);
-  //       });
-  //   }
-  // };
+  const handleOpenUpdateModal = (report) => {
+    setSelectedReport(report);
+    setOpenUpdateModal(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+    setSelectedReport(null);
+  };
+
+  const handleUpdateSuccess = (updatedReport) => {
+    onRefresh();
+    handleCloseUpdateModal();
+  };
 
   return (
     <>
-      <ToastContainer />
       <TableContainer component={Paper} sx={{ margin: '20px', maxWidth: '100%', overflow: 'auto' }}>
         <Table sx={{ minWidth: 700 }} aria-label="report table">
           <TableHead>
@@ -113,17 +118,25 @@ function ReportListTable({ reportList = [], onRefresh }) {
                   <StyledTableCell>{report.reportId}</StyledTableCell>
                   <StyledTableCell>{report.reportName}</StyledTableCell>
                   <StyledTableCell>
-                    <a href={report.reportLink} target="_blank" rel="noopener noreferrer">
+                    <Link href={report.reportLink} target="_blank" rel="noopener noreferrer">
                       {report.reportLink}
-                    </a>
+                    </Link>
                   </StyledTableCell>
                   <StyledTableCell>{report.status}</StyledTableCell>
                   <StyledTableCell>{report.createBy}</StyledTableCell>
                   <StyledTableCell>{report.updateBy}</StyledTableCell>
                   <StyledTableCell>
-                    <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
+                    {/* UpdateButton */}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      style={{ marginRight: 10 }}
+                      onClick={() => handleOpenUpdateModal(report)}
+                    >
                       Update
                     </Button>
+                    {/* RemoveButton */}
                     <Button
                       variant="contained"
                       color="error"
@@ -180,6 +193,17 @@ function ReportListTable({ reportList = [], onRefresh }) {
         title="Confirm Remove"
         content="Are you sure you want to remove this report?"
       />
+
+      {/* Update Modal */}
+      {selectedReport && (
+        <UpdateReportModal
+          open={openUpdateModal}
+          onClose={handleCloseUpdateModal}
+          reportId={selectedReport.reportId}
+          initialReportData={selectedReport}
+          onSuccess={handleUpdateSuccess}
+        />
+      )}
     </>
   );
 }
