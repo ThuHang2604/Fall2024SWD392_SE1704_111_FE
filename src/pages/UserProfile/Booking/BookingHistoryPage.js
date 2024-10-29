@@ -66,8 +66,8 @@ const BookingHistoryPage = () => {
           </Typography>
           {/* Tabs: Upcoming and Past */}
           <Tabs value={tabValue} onChange={handleTabChange} sx={{ marginBottom: '20px' }}>
-            <Tab label="Upcoming" />
             <Tab label="Past" />
+            <Tab label="Upcoming" />
           </Tabs>
 
           {/* Booking List for the Selected Tab */}

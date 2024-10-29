@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import ReportList from '@/components/TableList/ReportList/ReportList';
 import { getAllReport } from '@/api/ReportApi';
 
@@ -8,17 +10,17 @@ function ReportListPage() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const response = await getAllReport();
-        const data = response?.data || [];
-        setReportList(data);
-      } catch (error) {
-        setError('Failed to fetch reports. Please try again later.');
-      }
-    };
+  const fetchReports = async () => {
+    try {
+      const response = await getAllReport();
+      const data = response?.data || [];
+      setReportList(data);
+    } catch (error) {
+      setError('Failed to fetch reports. Please try again later.');
+    }
+  };
 
+  useEffect(() => {
     fetchReports();
   }, []);
 
@@ -32,14 +34,18 @@ function ReportListPage() {
   };
 
   return (
-    <ReportList
-      reportList={reportList}
-      page={page}
-      rowsPerPage={rowsPerPage}
-      handleChangePage={handleChangePage}
-      handleChangeRowsPerPage={handleChangeRowsPerPage}
-      error={error}
-    />
+    <>
+      <ReportList
+        reportList={reportList}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        handleChangePage={handleChangePage}
+        handleChangeRowsPerPage={handleChangeRowsPerPage}
+        error={error}
+        onRefresh={fetchReports}
+      />
+      <ToastContainer position="top-right" autoClose="3000" />
+    </>
   );
 }
 
