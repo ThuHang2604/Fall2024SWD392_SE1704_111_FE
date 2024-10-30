@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,6 +10,7 @@ import Paper from '@mui/material/Paper';
 import TableFooter from '@mui/material/TableFooter';
 import TablePagination from '@mui/material/TablePagination';
 import Button from '@mui/material/Button';
+import CreateReportModal from '@/components/Modal/ReportModal/CreateReport';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -34,6 +35,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 function BookingListTable({ bookingList = [] }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [openReportModal, setOpenReportModal] = useState(false);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - bookingList?.length) : 0;
 
@@ -44,6 +47,21 @@ function BookingListTable({ bookingList = [] }) {
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Create Report Handle
+  const handleOpenReportModal = (bookingId) => {
+    setSelectedBookingId(bookingId);
+    setOpenReportModal(true);
+  };
+
+  const handleCloseReportModal = () => {
+    setOpenReportModal(false);
+    setSelectedBookingId(null);
+  };
+
+  const handleSuccessCreateReport = () => {
+    setOpenReportModal(false);
   };
 
   return (
@@ -82,11 +100,13 @@ function BookingListTable({ bookingList = [] }) {
                 <StyledTableCell>{booking.status}</StyledTableCell>
                 <StyledTableCell>{new Date(booking.createDate).toLocaleString()}</StyledTableCell>
                 <StyledTableCell>
-                  <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
-                    Update
-                  </Button>
-                  <Button variant="contained" color="error" size="small">
-                    Remove
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => handleOpenReportModal(booking.bookingId)}
+                  >
+                    Create Report
                   </Button>
                 </StyledTableCell>
               </StyledTableRow>
@@ -94,7 +114,7 @@ function BookingListTable({ bookingList = [] }) {
           ) : (
             <TableRow>
               <StyledTableCell colSpan={8} align="center">
-                No bookings found.
+                No bookings found.2
               </StyledTableCell>
             </TableRow>
           )}
@@ -127,6 +147,14 @@ function BookingListTable({ bookingList = [] }) {
           </TableRow>
         </TableFooter>
       </Table>
+
+      {/* Create Report Modal */}
+      <CreateReportModal
+        open={openReportModal}
+        onClose={handleCloseReportModal}
+        bookingId={selectedBookingId}
+        onSuccess={handleSuccessCreateReport}
+      />
     </TableContainer>
   );
 }

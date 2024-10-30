@@ -3,16 +3,22 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from 'redux-persist/lib/storage';
 import authReducer from './slice/authSlice';
 import userProfileReducer from './slice/userProfileSlice';
+import bookingReducer from './slice/userBooking';
+import voucherReducer from './slice/voucherSlice';
+import hairServiceReducer from './slice/hairServiceSlice';
 const persistConfig = {
   key: 'root',
   storage,
   version: 1,
-  whitelist: ['auth', 'userProfile'],
+  whitelist: ['auth', 'userProfile', 'voucher'],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   userProfile: userProfileReducer,
+  booking: bookingReducer,
+  voucher: voucherReducer,
+  hairService: hairServiceReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);
