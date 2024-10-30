@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { Button, Modal, TextField, Box, Typography } from '@mui/material';
-import './styles.css';
 import { createReport } from '@/api/ReportApi';
 
 const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) => {
   const [reportName, setReportName] = useState('');
   const [reportLink, setReportLink] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handleClose = () => {
     onClose();
@@ -16,7 +19,7 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
 
   const handleSubmit = async () => {
     if (!reportName || !reportLink) {
-      console.error('Report name and link are required');
+      toast.error('Report name and link are required');
       return;
     }
 
@@ -30,16 +33,19 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
       setIsSubmitting(true);
       const response = await createReport(reportData);
       if (response.status === 1) {
-        console.log('Report created successfully:', response.data);
         onSuccess(response.data);
+        toast.success('Report created successfully');
+        setTimeout(() => {
+          navigate('/report-list');
+        }, 2000);
+        handleClose();
       } else {
-        console.error('Failed to create report:', response.message);
+        toast.error(`Failed to create report: ${response.message}`);
       }
     } catch (error) {
       console.error('Error creating report:', error);
     } finally {
       setIsSubmitting(false);
-      handleClose();
     }
   };
 
