@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import BookingList from '@/components/TableList/BookingList/BookingList';
 import { getBookingList } from '@/api/BookingApi';
 
@@ -20,7 +22,12 @@ function BookingListPage() {
     fetchBookings();
   }, []);
 
-  return <BookingList bookingList={bookingList} error={error} />;
+  return (
+    <>
+      <BookingList bookingList={bookingList} error={error} />;
+      <ToastContainer position="top-right" autoClose="3000" />
+    </>
+  );
 }
 
 export default BookingListPage;
