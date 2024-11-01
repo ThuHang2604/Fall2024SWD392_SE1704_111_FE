@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
 import { getScheduleList } from '@/api/ScheduleApi';
-// import { createBooking } from '@/api/BookingApi';
 import { createBooking } from '@/redux/slice/userBooking';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,15 +20,26 @@ import { useDispatch, useSelector } from 'react-redux';
 const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedule, setSelectedSchedule] = useState('');
+  const [userName, setUserName] = useState('');
+  const [phone, setPhone] = useState('');
   const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.userProfile); // Lấy thông tin user từ Redux
-  console.log('customer Id', user?.userProfileId);
+  const { user, isAuthenticated } = useSelector((state) => state.auth); // Kiểm tra trạng thái đăng nhập
+
   useEffect(() => {
     if (open) {
-      dispatch(getUserProfileCurrent()); // Lấy profile khi modal mở
-      fetchSchedules(); // Lấy danh sách schedule
+      if (isAuthenticated) {
+        dispatch(getUserProfileCurrent());
+      }
+      fetchSchedules();
     }
   }, [dispatch, open]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setUserName(user.fullName || '');
+      setPhone(user.phone || '');
+    }
+  }, [user, isAuthenticated]);
 
   const fetchSchedules = async () => {
     try {
@@ -42,21 +52,22 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
   };
 
   const handleBookNow = async () => {
-    // Lấy user từ Redux
-    const customerId = user?.userProfileId; // Lấy customerId từ userProfileId
+    const customerId = isAuthenticated ? user.userProfileId : null;
 
     const newBooking = {
-      scheduleId: selectedSchedule, // ID của lịch hẹn
-      customerId: customerId, // Gán customerId từ userProfile
-      serviceId: bookingData.map((item) => item.service.serviceId), // Lấy danh sách serviceId
-      stylistId: bookingData.map((item) => item.stylist.stylistId), // Lấy danh sách stylistId
+      scheduleId: selectedSchedule,
+      customerId: customerId,
+      userName: isAuthenticated ? user.fullName : userName,
+      phone: isAuthenticated ? user.phone : phone,
+      serviceId: bookingData.map((item) => item.service.serviceId),
+      stylistId: bookingData.map((item) => item.stylist.stylistId),
     };
 
     try {
       const resultAction = await dispatch(createBooking(newBooking));
       if (createBooking.fulfilled.match(resultAction)) {
         toast.success('Booking created successfully!');
-        onClose(); // Đóng modal nếu thành công
+        onClose();
       } else {
         throw new Error(resultAction.payload || 'Unknown error.');
       }
@@ -73,8 +84,31 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
           Confirm Your Appointment
         </Typography>
 
-        <TextField label="Name" value={user?.fullName || ''} fullWidth margin="normal" disabled />
-        <TextField label="Phone" value={user?.phone || ''} fullWidth margin="normal" disabled />
+        {isAuthenticated ? (
+          <>
+            <TextField label="Name" value={userName} fullWidth margin="normal" disabled />
+            <TextField label="Phone" value={phone} fullWidth margin="normal" disabled />
+          </>
+        ) : (
+          <>
+            <TextField
+              label="Name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <TextField
+              label="Phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              fullWidth
+              margin="normal"
+              required
+            />
+          </>
+        )}
 
         <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
           Selected Services
