@@ -8,23 +8,23 @@ function BookingListPage() {
   const [bookingList, setBookingList] = useState([]);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await getBookingList();
-        const data = response?.data || [];
-        setBookingList(data);
-      } catch (error) {
-        setError('Failed to fetch bookings. Please try again later.');
-      }
-    };
+  const fetchBookings = async () => {
+    try {
+      const response = await getBookingList();
+      const data = response?.data || [];
+      setBookingList(data);
+    } catch (error) {
+      setError('Failed to fetch bookings. Please try again later.');
+    }
+  };
 
+  useEffect(() => {
     fetchBookings();
   }, []);
 
   return (
     <>
-      <BookingList bookingList={bookingList} error={error} />;
+      <BookingList bookingList={bookingList} error={error} fetchBookings={fetchBookings} />;
       <ToastContainer position="top-right" autoClose="3000" />
     </>
   );

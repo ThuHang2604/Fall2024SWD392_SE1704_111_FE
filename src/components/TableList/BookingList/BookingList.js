@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import BookingListTable from './BookingListTable';
 
-function BookingList({ bookingList, error }) {
+function BookingList({ bookingList, error, fetchBookings }) {
   return (
     <div>
       <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40 }}>
@@ -16,7 +16,7 @@ function BookingList({ bookingList, error }) {
           </Typography>
         </Box>
       ) : (
-        <BookingListTable bookingList={bookingList} />
+        <BookingListTable bookingList={bookingList} fetchBookings={fetchBookings} />
       )}
     </div>
   );

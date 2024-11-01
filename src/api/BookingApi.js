@@ -1,4 +1,5 @@
 import axios from './axios';
+import Cookies from 'js-cookie';
 
 const createBooking = async (bookingData) => {
   try {
@@ -22,4 +23,26 @@ const getBookingList = async () => {
   }
 };
 
-export { createBooking, getBookingList };
+const checkIn = async (bookingId, status) => {
+  try {
+    const token = Cookies.get('authToken');
+    console.log('token', token);
+
+    const response = await axios.post(
+      `api/v1/booking/changeBookingStatus/${bookingId}`,
+      { status },
+      {
+        headers: {
+          accept: '*/*',
+          'Content-Type': 'application/json-patch+json',
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { createBooking, getBookingList, checkIn };

@@ -17,7 +17,7 @@ function ReportList({ reportList, error, onRefresh }) {
           </Typography>
         </Box>
       ) : (
-        <ReportListTable reportList={reportList} onRefresh={onRefresh} /> // Truyền onRefresh xuống ReportListTable
+        <ReportListTable reportList={reportList} onRefresh={onRefresh} />
       )}
     </div>
   );
