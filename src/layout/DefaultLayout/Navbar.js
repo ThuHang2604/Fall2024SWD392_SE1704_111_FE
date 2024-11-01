@@ -111,7 +111,7 @@ const Navbar = () => {
                   horizontal: 'right',
                 }}
               >
-                <MenuItem component={Link} to="/profile" onClick={handleClose}>
+                <MenuItem component={Link} to="/user" onClick={handleClose}>
                   Profile
                 </MenuItem>
                 <MenuItem onClick={handleLogout}>Log Out</MenuItem>

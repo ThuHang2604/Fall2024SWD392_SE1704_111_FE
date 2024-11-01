@@ -40,12 +40,12 @@ function LoginPage() {
   useEffect(() => {
     if (isAuthenticated && token) {
       const decoded = jwtDecode(token);
-      setDecodedToken(decoded); // Lưu trữ token đã decode
+      setDecodedToken(decoded);
 
       // Điều hướng tới trang khác sau khi đăng nhập thành công dựa trên vai trò
       if (decoded.role === 'Customer') {
         navigate('/', { replace: true });
-      } else if (decoded.role === 'Staff' || decoded.role === 'Stylist') {
+      } else if (decoded.role === 'Stylist') {
         navigate('/dashboard');
       }
     }

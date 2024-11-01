@@ -2,6 +2,7 @@
 import { initializeApp } from 'firebase/app';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, getToken } from 'firebase/messaging';
+import { getAuth } from 'firebase/auth';
 const firebaseConfig = {
   apiKey: 'AIzaSyBWUEQanLBeGpp6z5aNW8hcniFaFOVDfd8',
   authDomain: 'hair-salon-booking-391.firebaseapp.com',
@@ -17,6 +18,7 @@ const app = initializeApp(firebaseConfig);
 
 export const imageDb = getStorage(app);
 export const messaging = getMessaging(app);
+export const auth = getAuth(app);
 // export const generateToken = async () => {
 //   try {
 //     const permission = await Notification.requestPermission();
@@ -29,4 +31,17 @@ export const messaging = getMessaging(app);
 //   } catch (error) {
 //     console.error("Error getting token:", error);
 //   }
+// };
+// Hàm thiết lập reCAPTCHA
+// export const setupRecaptcha = () => {
+//   window.recaptchaVerifier = new RecaptchaVerifier(
+//     'recaptcha-container',
+//     {
+//       size: 'invisible',
+//       callback: (response) => {
+//         console.log('reCAPTCHA verified successfully.');
+//       },
+//     },
+//     auth,
+//   );
 // };

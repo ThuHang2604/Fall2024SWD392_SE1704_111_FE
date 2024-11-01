@@ -90,7 +90,7 @@ const BookingModal = ({ open, onClose, serviceId, onNext = () => {} }) => {
             <MenuItem value="" disabled>
               Select a stylist
             </MenuItem>
-            {stylists.map((stylist) => (
+            {stylists?.map((stylist) => (
               <MenuItem key={stylist.stylistId} value={stylist.stylistId}>
                 {stylist.stylistName}
               </MenuItem>

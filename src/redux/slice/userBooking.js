@@ -20,24 +20,14 @@ export const createBooking = createAsyncThunk('booking/createBooking', async (bo
 });
 
 // Thunk: Lấy lịch sử booking qua API
-export const getBookingHistory = createAsyncThunk('userProfile/getBookingHistory', async (_, { rejectWithValue }) => {
+export const getBookingHistory = createAsyncThunk('booking/getBookingHistory', async (_, { rejectWithValue }) => {
   try {
     const response = await instance.get('/api/v1/booking/history');
-    console.log('Booking history response:', response.data);
-
-    if (response.data && response.data.data) {
-      return response.data.data; // Return booking data if successful
-    } else {
-      throw new Error('No booking history found');
-    }
+    console.log('Booking history:', response.data);
+    return response.data.data; // Trả về danh sách lịch sử booking
   } catch (error) {
-    console.error('Error fetching booking history:', {
-      message: error.message,
-      response: error.response,
-      status: error.response?.status,
-      data: error.response?.data,
-    });
-    return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch booking history');
+    console.error('Error fetching booking history:', error);
+    return rejectWithValue(error.response?.data || 'Failed to fetch booking history');
   }
 });
 

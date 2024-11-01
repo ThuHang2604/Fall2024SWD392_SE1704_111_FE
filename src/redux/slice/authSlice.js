@@ -37,6 +37,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
 });
 
 // Thunk: Register user
+// Thunk: Register user
 export const registerUser = createAsyncThunk('auth/registerUser', async (userDetails, { rejectWithValue }) => {
   try {
     const response = await instance.post('/api/v1/users/Register', {

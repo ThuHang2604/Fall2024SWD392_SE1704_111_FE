@@ -64,15 +64,16 @@ export const getBookingHistory = createAsyncThunk('userProfile/getBookingHistory
     console.log('Booking history response:', response.data);
 
     if (response.data && response.data.data) {
-      return response.data.data; // Trả về danh sách booking nếu thành công
+      return response.data.data; // Return booking data if successful
     } else {
       throw new Error('No booking history found');
     }
   } catch (error) {
     console.error('Error fetching booking history:', error);
-    return rejectWithValue(error.response?.data || 'Failed to fetch booking history');
+    return rejectWithValue(error.response?.data?.message || 'Failed to fetch booking history');
   }
 });
+
 // Slice mới cho userProfile
 const userProfileSlice = createSlice({
   name: 'userProfile',
