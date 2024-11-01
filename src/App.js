@@ -4,7 +4,11 @@ import './App.css';
 
 import DefaultLayout from './layout/DefaultLayout';
 import AdminLayout from './layout/AdminLayout';
-
+import ProfileLayout from './layout/ProfileLayout/ProfileLayout';
+import SubscriptionPage from './pages/UserProfile/Subscriptions';
+import ProfilePage from './pages/UserProfile/Profile';
+// import UserBooking from './pages/UserProfile/UserBooking';
+import BookingHistoryPage from './pages/UserProfile/Booking/BookingHistoryPage';
 function App() {
   return (
     <div className="App">

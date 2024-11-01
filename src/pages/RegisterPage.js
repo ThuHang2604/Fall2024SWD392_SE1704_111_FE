@@ -3,7 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container, TextField, Button, Typography, Box } from '@mui/material';
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+  Typography,
+  TextField,
+  Container,
+  Box,
+} from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../redux/slice/authSlice';
@@ -17,20 +27,46 @@ function RegisterPage() {
     username: '',
     phone: '',
     password: '',
+    fullName: '',
+    email: '',
+    gender: '',
+    address: '',
+    dateOfBirth: '',
   };
 
   const FORM_VALIDATION = Yup.object().shape({
     username: Yup.string().required('Username is required'),
-    phone: Yup.string().required('Phone number is required'),
+    phone: Yup.string()
+      .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .required('Phone number is required'),
     password: Yup.string().required('Password is required'),
+    fullName: Yup.string().required('Full Name is required'),
+    email: Yup.string()
+      .email('Invalid email format')
+      .matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must be a valid Gmail address ( abc@gmail.com)')
+      .required('Email is required'),
+    gender: Yup.string().oneOf(['0', '1'], 'Gender is required').required('Gender is required'),
+    address: Yup.string().required('Address is required'),
+    dateOfBirth: Yup.date()
+      .required('Date of birth is required')
+      .test('age', 'You must be at least 18 years old', function (value) {
+        const today = new Date();
+        const birthDate = new Date(value);
+        const age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        const dayDifference = today.getDate() - birthDate.getDate();
+        if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+          return age - 1 >= 18;
+        }
+        return age >= 18;
+      }),
   });
 
   const handleSubmitRegister = async (values) => {
     const resultAction = await dispatch(
       registerUser({
-        username: values.username,
-        phone: values.phone,
-        password: values.password,
+        ...values,
+        gender: parseInt(values.gender, 10), // Convert gender to an integer
       }),
     );
 
@@ -97,6 +133,44 @@ function RegisterPage() {
                 {({ field }) => <TextField fullWidth margin="normal" label="Password" type="password" {...field} />}
               </Field>
               <ErrorMessage name="password" component="div" className="text-danger" />
+
+              <Field name="fullName">
+                {({ field }) => <TextField fullWidth margin="normal" label="Full Name" {...field} />}
+              </Field>
+              <ErrorMessage name="fullName" component="div" className="text-danger" />
+
+              <Field name="email">
+                {({ field }) => <TextField fullWidth margin="normal" label="Email" {...field} />}
+              </Field>
+              <ErrorMessage name="email" component="div" className="text-danger" />
+
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Gender</InputLabel>
+                <Field name="gender" as={Select} label="Gender">
+                  <MenuItem value="0">Male</MenuItem>
+                  <MenuItem value="1">Female</MenuItem>
+                </Field>
+                <ErrorMessage name="gender" component="div" className="text-danger" />
+              </FormControl>
+
+              <Field name="address">
+                {({ field }) => <TextField fullWidth margin="normal" label="Address" {...field} />}
+              </Field>
+              <ErrorMessage name="address" component="div" className="text-danger" />
+
+              <Field name="dateOfBirth">
+                {({ field }) => (
+                  <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Date of Birth"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    {...field}
+                  />
+                )}
+              </Field>
+              <ErrorMessage name="dateOfBirth" component="div" className="text-danger" />
 
               <Button
                 fullWidth

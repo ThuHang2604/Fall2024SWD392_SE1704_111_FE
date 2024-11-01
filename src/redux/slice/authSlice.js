@@ -43,6 +43,11 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDet
       username: userDetails.username,
       password: userDetails.password,
       phone: userDetails.phone,
+      fullName: userDetails.fullName,
+      email: userDetails.email,
+      gender: userDetails.gender,
+      address: userDetails.address,
+      dateOfBirth: userDetails.dateOfBirth,
     });
 
     return response.data;

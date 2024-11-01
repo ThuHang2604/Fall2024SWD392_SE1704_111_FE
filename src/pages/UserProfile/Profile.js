@@ -76,6 +76,21 @@ const ProfilePage = () => {
   };
 
   const handleSubmit = async () => {
+    const profileData = {
+      userProfileId: user.userProfileId,
+      fullName: formData.fullName,
+      email: formData.email,
+      gender: formData.gender,
+      address: formData.address,
+      dateOfBirth: formData.dateOfBirth,
+      phone: formData.phone,
+    };
+
+    // Only include imageLink if there is a valid image URL
+    if (formData.imageLink) {
+      profileData.imageLink = formData.imageLink;
+    }
+
     try {
       setLoading(true);
       const actionResult = await dispatch(updateCurrentProfile(formData));
@@ -133,7 +148,7 @@ const ProfilePage = () => {
             textAlign: 'left',
           }}
         >
-          <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 3, color: '#f26e3f', fontFamily: 'Monoton, Fantasy' }}>
+          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy' }}>
             ACCOUNT
           </Typography>
           <Typography variant="body2" mb={2}>

@@ -42,21 +42,22 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
   };
 
   const handleBookNow = async () => {
-    // Lấy user từ Redux
-    const customerId = user?.userProfileId; // Lấy customerId từ userProfileId
+    const customerId = user?.userProfileId;
 
     const newBooking = {
-      scheduleId: selectedSchedule, // ID của lịch hẹn
-      customerId: customerId, // Gán customerId từ userProfile
-      serviceId: bookingData.map((item) => item.service.serviceId), // Lấy danh sách serviceId
-      stylistId: bookingData.map((item) => item.stylist.stylistId), // Lấy danh sách stylistId
+      scheduleId: selectedSchedule,
+      customerId: customerId,
+      serviceId: bookingData.map((item) => item.service.serviceId),
+      stylistId: bookingData.map((item) => item.stylist.stylistId),
     };
+
+    console.log('Booking Payload:', newBooking); // Debug payload
 
     try {
       const resultAction = await dispatch(createBooking(newBooking));
       if (createBooking.fulfilled.match(resultAction)) {
         toast.success('Booking created successfully!');
-        onClose(); // Đóng modal nếu thành công
+        onClose();
       } else {
         throw new Error(resultAction.payload || 'Unknown error.');
       }
