@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { publicRoutes, adminRoutes } from './routes/routes';
 import './App.css';
 
@@ -32,7 +32,13 @@ function App() {
               );
             })}
           </Route>
-
+          {/* Profile Routes */}
+          <Route path="/user" element={<ProfileLayout />}>
+            <Route path="profile" element={<ProfilePage />} />
+            <Route path="subscriptions" element={<SubscriptionPage />} />
+            <Route path="booking" element={<BookingHistoryPage />} />
+            <Route index element={<Navigate to="profile" replace />} />
+          </Route>
           {/* Admin routes */}
           <Route>
             {adminRoutes.map((item, index) => {

@@ -30,7 +30,7 @@ const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppo
   }, [open, dispatch]);
 
   useEffect(() => {
-    const total = bookingData.reduce((acc, item) => acc + item.service.price, 0);
+    const total = bookingData?.reduce((acc, item) => acc + item.service.price, 0);
     setTotalPrice(total);
   }, [bookingData]);
 
@@ -55,7 +55,7 @@ const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppo
         </Typography>
 
         <List>
-          {bookingData.map((item, index) => (
+          {bookingData?.map((item, index) => (
             <ListItem
               key={index}
               secondaryAction={
@@ -87,7 +87,7 @@ const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppo
         </FormControl>
 
         <Typography variant="h6" sx={{ mt: 2, textAlign: 'right' }}>
-          Total: ${applyVoucherDiscount().toFixed(2)}
+          Total: ${applyVoucherDiscount()?.toFixed(2)}
         </Typography>
 
         <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 20 }}>

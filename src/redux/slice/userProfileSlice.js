@@ -9,6 +9,7 @@ export const getUserProfileCurrent = createAsyncThunk(
     try {
       const response = await instance.get('/api/v1/userprofile/current');
       console.log('User profile response:', response.data);
+      // console.log('User profile status:', response.data.status);
 
       if (response.data && response.data.data) {
         return response.data.data;
@@ -63,23 +64,24 @@ export const getBookingHistory = createAsyncThunk('userProfile/getBookingHistory
     console.log('Booking history response:', response.data);
 
     if (response.data && response.data.data) {
-      return response.data.data; // Return booking data if successful
+      return response.data.data; // Trả về danh sách booking nếu thành công
     } else {
       throw new Error('No booking history found');
     }
   } catch (error) {
     console.error('Error fetching booking history:', error);
-    return rejectWithValue(error.response?.data?.message || 'Failed to fetch booking history');
+    return rejectWithValue(error.response?.data || 'Failed to fetch booking history');
   }
 });
-
 // Slice mới cho userProfile
 const userProfileSlice = createSlice({
   name: 'userProfile',
   initialState: {
     user: null,
+    bookingHistory: [],
     isLoading: false,
     error: null,
+    previewImage: '',
   },
   reducers: {
     setUser: (state, action) => {
@@ -87,8 +89,12 @@ const userProfileSlice = createSlice({
     },
     clearUser: (state) => {
       state.user = null;
+      state.bookingHistory = [];
       state.error = null;
       Cookies.remove('authToken');
+    },
+    setPreviewImage: (state, action) => {
+      state.previewImage = action.payload; // New action to store preview image
     },
   },
   extraReducers: (builder) => {
@@ -105,6 +111,7 @@ const userProfileSlice = createSlice({
       .addCase(getUserProfileCurrent.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+        state.previewImage = action.payload.imageLink;
       })
 
       // Get User Profile By ID
@@ -133,10 +140,23 @@ const userProfileSlice = createSlice({
       .addCase(updateCurrentProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+
+      .addCase(getBookingHistory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getBookingHistory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.bookingHistory = action.payload; // Lưu lịch sử booking vào state
+      })
+      .addCase(getBookingHistory.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       });
   },
 });
 
 // Export actions và reducer
-export const { setUser, clearUser } = userProfileSlice.actions;
+export const { setUser, clearUser, setPreviewImage } = userProfileSlice.actions;
 export default userProfileSlice.reducer;
