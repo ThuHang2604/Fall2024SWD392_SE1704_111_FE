@@ -6,11 +6,12 @@ import userProfileReducer from './slice/userProfileSlice';
 import bookingReducer from './slice/userBooking';
 import voucherReducer from './slice/voucherSlice';
 import hairServiceReducer from './slice/hairServiceSlice';
+import feedbackReducer from './slice/feedbackSlice';
 const persistConfig = {
   key: 'root',
   storage,
   version: 1,
-  whitelist: ['auth', 'userProfile', 'voucher'],
+  whitelist: ['auth', 'userProfile', 'voucher', 'feedback'],
 };
 
 const rootReducer = combineReducers({
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
   booking: bookingReducer,
   voucher: voucherReducer,
   hairService: hairServiceReducer,
+  feedBack: feedbackReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);

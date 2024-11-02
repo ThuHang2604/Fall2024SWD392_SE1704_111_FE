@@ -9,6 +9,7 @@ import SubscriptionPage from './pages/UserProfile/Subscriptions';
 import ProfilePage from './pages/UserProfile/Profile';
 import UserBooking from './pages/UserProfile/UserBooking';
 import BookingHistoryPage from './pages/UserProfile/Booking/BookingHistoryPage';
+import FeedbackList from './pages/UserProfile/Feedback/Feedback';
 function App() {
   return (
     <div className="App">
@@ -37,6 +38,7 @@ function App() {
             <Route path="profile" element={<ProfilePage />} />
             <Route path="subscriptions" element={<SubscriptionPage />} />
             <Route path="booking" element={<BookingHistoryPage />} />
+            <Route path="feedback" element={<FeedbackList />} />
             <Route index element={<Navigate to="profile" replace />} />
           </Route>
           {/* Admin routes */}

@@ -136,7 +136,7 @@ const ProfilePage = () => {
             textAlign: 'left',
           }}
         >
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy' }}>
             ACCOUNT
           </Typography>
           <Typography variant="body1" gutterBottom>

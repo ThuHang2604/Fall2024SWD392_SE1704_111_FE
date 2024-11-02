@@ -20,14 +20,16 @@ import { getVoucherList } from '@/redux/slice/voucherSlice';
 const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppointment }) => {
   const dispatch = useDispatch();
   const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
+  const { isAuthenticated } = useSelector((state) => state.auth); // Kiểm tra trạng thái đăng nhập
   const [selectedVoucher, setSelectedVoucher] = useState('');
   const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
-    if (open) {
+    if (open && isAuthenticated) {
+      // Chỉ gọi API voucher khi đã đăng nhập
       dispatch(getVoucherList());
     }
-  }, [open, dispatch]);
+  }, [open, dispatch, isAuthenticated]);
 
   useEffect(() => {
     const total = bookingData.reduce((acc, item) => acc + item.service.price, 0);
@@ -72,19 +74,22 @@ const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppo
           ))}
         </List>
 
-        <FormControl fullWidth sx={{ mt: 2 }} disabled={isLoading}>
-          <InputLabel>Voucher</InputLabel>
-          <Select value={selectedVoucher} onChange={handleVoucherChange} label="Voucher">
-            <MenuItem value="">
-              <em>None</em>
-            </MenuItem>
-            {vouchers?.map((voucher) => (
-              <MenuItem key={voucher.voucherId} value={voucher.voucherId}>
-                Voucher {voucher.voucherId} - Discount: ${voucher.discountAmount}
+        {/* Hiển thị voucher khi đã đăng nhập */}
+        {isAuthenticated && (
+          <FormControl fullWidth sx={{ mt: 2 }} disabled={isLoading}>
+            <InputLabel>Voucher</InputLabel>
+            <Select value={selectedVoucher} onChange={handleVoucherChange} label="Voucher">
+              <MenuItem value="">
+                <em>None</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {vouchers?.map((voucher) => (
+                <MenuItem key={voucher.voucherId} value={voucher.voucherId}>
+                  Voucher {voucher.voucherId} - Discount: ${voucher.discountAmount}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         <Typography variant="h6" sx={{ mt: 2, textAlign: 'right' }}>
           Total: ${applyVoucherDiscount().toFixed(2)}
