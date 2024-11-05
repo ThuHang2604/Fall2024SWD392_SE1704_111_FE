@@ -25,7 +25,7 @@ const publicRoutes = [
     component: LoginPage,
   },
   {
-    title: 'Login',
+    title: 'Forget Password',
     path: '/forgot-password',
     component: ForgotPassword,
   },
