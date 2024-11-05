@@ -5,6 +5,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
+import { Link as ScrollLink } from 'react-scroll'; // Import from react-scroll
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -48,6 +49,35 @@ const Navbar = () => {
           >
             HOME
           </Button>
+
+          {/* Add Scroll Links for About, Process, and Contact */}
+          <Button
+            component={ScrollLink}
+            to="about-section"
+            smooth={true}
+            duration={500}
+            sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
+          >
+            ABOUT
+          </Button>
+          <Button
+            component={ScrollLink}
+            to="process-section"
+            smooth={true}
+            duration={500}
+            sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
+          >
+            PROCESS
+          </Button>
+          <Button
+            component={ScrollLink}
+            to="contact-section"
+            smooth={true}
+            duration={500}
+            sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
+          >
+            CONTACT
+          </Button>
           <Button
             component={Link}
             to="/service-page"
@@ -55,12 +85,12 @@ const Navbar = () => {
           >
             SERVICES
           </Button>
-          {/* <Button
+          <Button
             onClick={handleLogout}
             sx={{ color: 'black', fontSize: '16px', letterSpacing: '1.5px', fontWeight: 'bold', textTransform: 'none' }}
           >
             Log out
-          </Button> */}
+          </Button>
         </Box>
 
         {/* User Account & Cart */}

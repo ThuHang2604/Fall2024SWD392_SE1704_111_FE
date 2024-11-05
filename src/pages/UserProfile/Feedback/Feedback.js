@@ -91,7 +91,7 @@ const FeedbackList = () => {
                     transform: feedback.userId === loggedInUserId ? 'scale(1.05)' : 'scale(1)', // Slightly larger for own feedbacks
                   }}
                 >
-                  <CardContent>
+                  <CardContent style={{ color: 'black' }}>
                     <Typography variant="body1" color="inherit" gutterBottom>
                       {feedback.description || 'No Description'}
                     </Typography>

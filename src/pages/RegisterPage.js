@@ -24,7 +24,7 @@ function RegisterPage() {
   const { isLoading, error } = useSelector((state) => state.auth);
 
   const INITIAL_FORM_STATE = {
-    username: '',
+    userName: '',
     phone: '',
     password: '',
     fullName: '',
@@ -35,7 +35,7 @@ function RegisterPage() {
   };
 
   const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string().required('Username is required'),
+    userName: Yup.string().required('Username is required'),
     phone: Yup.string()
       .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
       .required('Phone number is required'),
@@ -63,10 +63,13 @@ function RegisterPage() {
   });
 
   const handleSubmitRegister = async (values) => {
+    console.log('Register Data:', values); // Add this line
+
     const resultAction = await dispatch(
       registerUser({
         ...values,
         gender: parseInt(values.gender, 10), // Convert gender to an integer
+        userName: values.userName, // Sửa lại đúng tên trường 'userName'
       }),
     );
 
@@ -119,10 +122,10 @@ function RegisterPage() {
         >
           {({ isSubmitting }) => (
             <Form>
-              <Field name="username">
-                {({ field }) => <TextField fullWidth margin="normal" label="Username" {...field} />}
+              <Field name="userName">
+                {({ field }) => <TextField fullWidth margin="normal" label="UserName" {...field} />}
               </Field>
-              <ErrorMessage name="username" component="div" className="text-danger" />
+              <ErrorMessage name="userName" component="div" className="text-danger" />
 
               <Field name="phone">
                 {({ field }) => <TextField fullWidth margin="normal" label="Phone number" {...field} />}

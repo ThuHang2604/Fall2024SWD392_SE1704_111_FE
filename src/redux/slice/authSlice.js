@@ -41,7 +41,7 @@ export const logoutUser = createAsyncThunk('auth/logoutUser', async (_, { reject
 export const registerUser = createAsyncThunk('auth/registerUser', async (userDetails, { rejectWithValue }) => {
   try {
     const response = await instance.post('/api/v1/users/Register', {
-      username: userDetails.username,
+      userName: userDetails.userName,
       password: userDetails.password,
       phone: userDetails.phone,
       fullName: userDetails.fullName,
@@ -50,10 +50,11 @@ export const registerUser = createAsyncThunk('auth/registerUser', async (userDet
       address: userDetails.address,
       dateOfBirth: userDetails.dateOfBirth,
     });
-
+    console.log('Register :', response.data);
     return response.data;
   } catch (error) {
     console.error('Registration error:', error);
+    console.log('Full error response:', error.response); // Log full response
     return rejectWithValue(error.response?.data || 'Registration failed');
   }
 });
