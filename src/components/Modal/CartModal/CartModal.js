@@ -1,108 +1,65 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { useDispatch, useSelector } from 'react-redux';
-import { getVoucherList } from '@/redux/slice/voucherSlice';
+import { Modal, Box, Typography, Select, MenuItem, Button } from '@mui/material';
+import { getScheduleList } from '@/api/ScheduleApi';
+import './styles.css';
 
-const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppointment }) => {
-  const dispatch = useDispatch();
-  const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
-  const { isAuthenticated } = useSelector((state) => state.auth); // Kiểm tra trạng thái đăng nhập
-  const [selectedVoucher, setSelectedVoucher] = useState('');
-  const [totalPrice, setTotalPrice] = useState(0);
+const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
+  const [schedules, setSchedules] = useState([]);
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
 
   useEffect(() => {
-    if (open && isAuthenticated) {
-      // Chỉ gọi API voucher khi đã đăng nhập
-      dispatch(getVoucherList());
+    if (open) {
+      fetchSchedules();
     }
-  }, [open, dispatch, isAuthenticated]);
+  }, [open]);
 
-  useEffect(() => {
-    const total = bookingData.reduce((acc, item) => acc + item.service.price, 0);
-    setTotalPrice(total);
-  }, [bookingData]);
-
-  const handleVoucherChange = (event) => {
-    setSelectedVoucher(event.target.value);
+  const fetchSchedules = async () => {
+    try {
+      const response = await getScheduleList();
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Failed to fetch schedule list:', error);
+    }
   };
 
-  const applyVoucherDiscount = () => {
-    const voucher = vouchers?.find((v) => v.voucherId === selectedVoucher);
-    if (voucher) {
-      const discountAmount = voucher.discountAmount;
-      return totalPrice - discountAmount;
-    }
-    return totalPrice;
+  const handleScheduleSelect = (event) => {
+    // Update selected schedules and ensure uniqueness
+    const value = event.target.value;
+    const uniqueSchedules = Array.from(new Set(value)); // Remove duplicates
+    setSelectedSchedules(uniqueSchedules);
+  };
+
+  const handleNext = () => {
+    const updatedBookingData = bookingData.map((item) => ({
+      ...item,
+      schedules: selectedSchedules,
+    }));
+    setBookingData(updatedBookingData);
+    onNext(updatedBookingData);
   };
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box className="modal-box" sx={{ p: 4, borderRadius: 2, backgroundColor: 'white', minWidth: 400 }}>
+      <Box className="modal-box">
         <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Appointment Summary
+          Select Schedule(s)
         </Typography>
-
-        <List>
-          {bookingData.map((item, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={() => onRemoveService(index)}>
-                  <DeleteIcon color="error" />
-                </IconButton>
-              }
-            >
-              <ListItemText
-                primary={`${item.service.serviceName} with ${item.stylist.stylistName}`}
-                secondary={`${item.service.estimateTime} min | $${item.service.price}`}
-              />
-            </ListItem>
+        <Select multiple value={selectedSchedules} onChange={handleScheduleSelect} fullWidth>
+          {schedules.map((schedule) => (
+            <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
+              {`From ${schedule.startTime} to ${schedule.endTime}`}
+            </MenuItem>
           ))}
-        </List>
-
-        {/* Hiển thị voucher khi đã đăng nhập */}
-        {isAuthenticated && (
-          <FormControl fullWidth sx={{ mt: 2 }} disabled={isLoading}>
-            <InputLabel>Voucher</InputLabel>
-            <Select value={selectedVoucher} onChange={handleVoucherChange} label="Voucher">
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              {vouchers?.map((voucher) => (
-                <MenuItem key={voucher.voucherId} value={voucher.voucherId}>
-                  Voucher {voucher.voucherId} - Discount: ${voucher.discountAmount}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        )}
-
-        <Typography variant="h6" sx={{ mt: 2, textAlign: 'right' }}>
-          Total: ${applyVoucherDiscount().toFixed(2)}
-        </Typography>
-
-        <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 20 }}>
-          <Button onClick={onClose} variant="text" color="primary">
-            + Add Service
-          </Button>
-          <Button onClick={() => onScheduleAppointment(selectedVoucher)} variant="contained" color="primary">
-            Schedule Appointment
-          </Button>
-        </div>
+        </Select>
+        <Button
+          onClick={handleNext}
+          disabled={selectedSchedules.length === 0}
+          sx={{ marginTop: 2 }}
+          variant="contained"
+          color="primary"
+        >
+          Next
+        </Button>
       </Box>
     </Modal>
   );

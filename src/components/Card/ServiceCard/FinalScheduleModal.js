@@ -3,152 +3,151 @@ import {
   Modal,
   Box,
   Typography,
-  TextField,
-  Select,
-  MenuItem,
-  Button,
   List,
   ListItem,
   ListItemText,
+  IconButton,
+  Button,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  TextField,
 } from '@mui/material';
-import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
-import { getScheduleList } from '@/api/ScheduleApi';
-import { createBooking } from '@/redux/slice/userBooking';
-import { toast } from 'react-toastify';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from 'react-redux';
+import { getVoucherList } from '@/redux/slice/voucherSlice';
+import { createBooking } from '@/redux/slice/userBooking';
 
-const FinalScheduleModal = ({ open, onClose, bookingData, onBack }) => {
-  const [schedules, setSchedules] = useState([]);
-  const [selectedSchedule, setSelectedSchedule] = useState('');
-  const [userName, setUserName] = useState('');
-  const [phone, setPhone] = useState('');
+const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => {
   const dispatch = useDispatch();
-  const { user, isAuthenticated } = useSelector((state) => state.auth); // Kiểm tra trạng thái đăng nhập
+  const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
+  const { user } = useSelector((state) => state.userProfile);
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const [selectedVoucher, setSelectedVoucher] = useState('');
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
 
   useEffect(() => {
-    if (open) {
-      if (isAuthenticated) {
-        dispatch(getUserProfileCurrent());
+    if (open && isAuthenticated) {
+      dispatch(getVoucherList());
+      if (user) {
+        setName(user.fullName);
+        setPhone(user.phone);
       }
-      fetchSchedules();
     }
-  }, [dispatch, open]);
+  }, [open, dispatch, isAuthenticated, user]);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      setUserName(user.fullName || '');
-      setPhone(user.phone || '');
-    }
-  }, [user, isAuthenticated]);
+    const total = bookingData.reduce((acc, item) => acc + item.service.price, 0);
+    setTotalPrice(total);
+  }, [bookingData]);
 
-  const fetchSchedules = async () => {
-    try {
-      const schedules = await getScheduleList();
-      setSchedules(schedules.data);
-    } catch (error) {
-      console.error('Failed to fetch schedule list:', error);
-      toast.error('Unable to load schedules. Please try again.');
+  const applyVoucherDiscount = () => {
+    const voucher = vouchers?.find((v) => v.voucherId === selectedVoucher);
+    if (voucher) {
+      return Math.max(totalPrice - voucher.discountAmount, 0);
     }
+    return totalPrice;
   };
 
-  const handleBookNow = async () => {
-    const customerId = isAuthenticated ? user.userProfileId : null;
-
-    const newBooking = {
-      scheduleId: selectedSchedule,
-      customerId: customerId,
-      userName: isAuthenticated ? user.fullName : userName,
+  const handleCreateBooking = async () => {
+    const bookingPayload = {
+      userName: isAuthenticated ? user.fullName : name,
       phone: isAuthenticated ? user.phone : phone,
+      voucherId: selectedVoucher ? selectedVoucher : null,
+      scheduleId: Array.from(new Set(bookingData.flatMap((item) => item.schedules))), // Ensure unique schedule IDs
       serviceId: bookingData.map((item) => item.service.serviceId),
       stylistId: bookingData.map((item) => item.stylist.stylistId),
     };
 
+    console.log('Payload being sent to createBooking:', bookingPayload);
+
     try {
-      const resultAction = await dispatch(createBooking(newBooking));
+      const resultAction = await dispatch(createBooking(bookingPayload));
       if (createBooking.fulfilled.match(resultAction)) {
-        toast.success('Booking created successfully!');
+        console.log('Booking created successfully');
         onClose();
       } else {
         throw new Error(resultAction.payload || 'Unknown error.');
       }
     } catch (error) {
-      console.error('Booking Error:', error);
-      toast.error('Booking failed. Please try again.');
+      console.error('Error creating booking:', error);
+      alert('Booking failed. Please try again.');
     }
   };
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box className="modal-box">
+      <Box className="modal-box" sx={{ p: 4, borderRadius: 2, backgroundColor: 'white', minWidth: 400 }}>
         <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Confirm Your Appointment
+          Appointment Summary
         </Typography>
 
-        {isAuthenticated ? (
-          <>
-            <TextField label="Name" value={userName} fullWidth margin="normal" disabled />
-            <TextField label="Phone" value={phone} fullWidth margin="normal" disabled />
-          </>
-        ) : (
-          <>
-            <TextField
-              label="Name"
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-            <TextField
-              label="Phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              fullWidth
-              margin="normal"
-              required
-            />
-          </>
-        )}
+        {/* Name and Phone input fields */}
+        <TextField
+          label="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          fullWidth
+          margin="normal"
+          required={!isAuthenticated}
+          disabled={isAuthenticated}
+        />
+        <TextField
+          label="Phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          fullWidth
+          margin="normal"
+          required={!isAuthenticated}
+          disabled={isAuthenticated}
+        />
 
-        <Typography variant="h6" sx={{ marginTop: 2, marginBottom: 1 }}>
-          Selected Services
-        </Typography>
         <List>
-          {bookingData.map((item, index) => (
+          {bookingData?.map((item, index) => (
             <ListItem key={index}>
               <ListItemText
-                primary={`${item.service.serviceName} with ${item.stylist.stylistName}`}
-                secondary={`${item.service.estimateTime} min | $${item.service.price}`}
+                primary={`${item?.service?.serviceName} with ${item?.stylist?.stylistName}`}
+                secondary={`Scheduled: ${item.schedules?.map((scheduleId) => `#${scheduleId}`).join(', ')} | ${item.service.estimateTime} min | $${item.service.price}`}
               />
+              <IconButton edge="end" onClick={() => onRemoveService(index)}>
+                <DeleteIcon color="error" />
+              </IconButton>
             </ListItem>
           ))}
         </List>
 
-        <Select
-          value={selectedSchedule}
-          onChange={(e) => setSelectedSchedule(e.target.value)}
-          fullWidth
-          displayEmpty
-          sx={{ marginTop: 2 }}
-        >
-          <MenuItem value="" disabled>
-            Select a schedule
-          </MenuItem>
-          {schedules.map((schedule) => (
-            <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
-              {`From ${schedule.startTime} to ${schedule.endTime} on ${new Date(schedule.startDate).toLocaleDateString()}`}
-            </MenuItem>
-          ))}
-        </Select>
+        {isAuthenticated && (
+          <FormControl fullWidth sx={{ mt: 2 }} disabled={isLoading}>
+            <InputLabel>Voucher</InputLabel>
+            <Select value={selectedVoucher} onChange={(e) => setSelectedVoucher(e.target.value)}>
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {vouchers.map((voucher) => (
+                <MenuItem key={voucher.voucherId} value={voucher.voucherId}>
+                  Voucher {voucher.voucherId} - Discount: ${voucher.discountAmount}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-          <Button variant="text" color="primary" onClick={onBack}>
-            Back
+        <Typography variant="h6" sx={{ mt: 2, textAlign: 'right' }}>
+          Total: ${applyVoucherDiscount().toFixed(2)}
+        </Typography>
+
+        <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 20 }}>
+          <Button onClick={onClose} variant="text" color="primary">
+            + Add Service
           </Button>
-          <Button onClick={handleBookNow} variant="contained" color="primary" disabled={!selectedSchedule}>
+          <Button onClick={handleCreateBooking} variant="contained" color="primary" disabled={!name || !phone}>
             Confirm Appointment
           </Button>
-        </Box>
+        </div>
       </Box>
     </Modal>
   );

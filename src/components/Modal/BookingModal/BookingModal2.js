@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Box, Typography, Select, MenuItem, Button } from '@mui/material';
 import { getStylistByServiceID } from '@/api/StylistApi';
 import './styles.css';
-
 const BookingModal = ({ open, onClose, service, onNext }) => {
   const [stylists, setStylists] = useState([]);
   const [selectedStylist, setSelectedStylist] = useState('');
 
-  // Fetch stylists based on selected service
   useEffect(() => {
     if (service) {
       getStylistByServiceID(service.serviceId).then((response) => {
@@ -29,11 +27,9 @@ const BookingModal = ({ open, onClose, service, onNext }) => {
           Select Your Stylist
         </Typography>
         <Select value={selectedStylist} onChange={(e) => setSelectedStylist(e.target.value)} fullWidth displayEmpty>
-          {/* Placeholder */}
           <MenuItem value="" disabled>
             Choose your stylist
           </MenuItem>
-          {/* Map through stylists */}
           {stylists.map((stylist) => (
             <MenuItem key={stylist.stylistId} value={stylist}>
               {stylist.stylistName}

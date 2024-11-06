@@ -8,14 +8,18 @@ export const createBooking = createAsyncThunk('booking/createBooking', async (bo
     const response = await instance.post('/api/v1/booking/createBooking', bookingData);
     console.log('Booking Created:', response.data);
 
-    // if (response.data.status !== 1) {
-    //   throw new Error(response.data.message || 'Booking failed.');
-    // }
-
-    return response.data.data; // Trả về dữ liệu booking
+    // Ensure response structure is as expected
+    if (response.data && response.data.status === 1 && response.data.data) {
+      return response.data.data; // Trả về dữ liệu booking
+    } else {
+      throw new Error(response.data.message || 'Booking creation failed due to an unexpected response structure.');
+    }
   } catch (error) {
     console.error('Error creating booking:', error);
-    return rejectWithValue(error.response?.data || 'Failed to create booking.');
+    // Enhanced error handling to account for various types of errors
+    return rejectWithValue(
+      error.response?.data?.message || 'Failed to create booking due to a network or server error.',
+    );
   }
 });
 

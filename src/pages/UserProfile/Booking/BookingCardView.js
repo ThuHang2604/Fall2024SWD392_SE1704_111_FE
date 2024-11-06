@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -11,17 +11,11 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  IconButton,
-  CircularProgress,
   styled,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import { fetchServiceById } from '@/redux/slice/hairServiceSlice'; // API action
-import { useDispatch, useSelector } from 'react-redux';
 
-// Enum for booking statuses
 const BookingStatus = {
   0: 'None',
   1: 'InQueue',
@@ -32,28 +26,26 @@ const BookingStatus = {
   6: 'Cancel',
 };
 
-// Status label and chip color functions
 const getStatusLabel = (status) => BookingStatus[status] || 'Unknown Status';
 const getChipColor = (status) => {
   switch (status) {
     case 1:
-      return 'primary'; // InQueue - Blue
+      return 'primary';
     case 2:
-      return 'info'; // Accepted - Light Blue
+      return 'info';
     case 3:
-      return 'warning'; // InProgress - Orange
+      return 'warning';
     case 4:
-      return 'error'; // Delay - Red
+      return 'error';
     case 5:
-      return 'success'; // Complete - Green
+      return 'success';
     case 6:
-      return 'default'; // Cancel - Gray
+      return 'default';
     default:
-      return 'secondary'; // None - Default gray
+      return 'secondary';
   }
 };
 
-// Styled Accordion for better appearance
 const StyledAccordion = styled(Accordion)(() => ({
   boxShadow: 'none',
   borderRadius: '8px',
@@ -63,32 +55,10 @@ const StyledAccordion = styled(Accordion)(() => ({
 }));
 
 const BookingCardView = ({ bookings }) => {
-  const dispatch = useDispatch();
-  const [expanded, setExpanded] = useState(false); // Track expanded accordion
-  const [serviceDetails, setServiceDetails] = useState({}); // Cache service details
+  const [expanded, setExpanded] = useState(false);
 
-  // Fetch service details when a service ID is provided
-  const loadServiceDetails = async (serviceId) => {
-    if (!serviceDetails[serviceId]) {
-      try {
-        const result = await dispatch(fetchServiceById(serviceId));
-        setServiceDetails((prev) => ({
-          ...prev,
-          [serviceId]: result.payload, // Cache the service details
-        }));
-      } catch (error) {
-        console.error('Failed to load service details:', error);
-      }
-    }
-  };
-
-  // Handle accordion toggle and fetch service details when expanded
-  const handleAccordionToggle = (bookingId, services) => (event, isExpanded) => {
-    setExpanded(isExpanded ? bookingId : false); // Expand or collapse
-
-    if (isExpanded) {
-      services?.forEach((service) => loadServiceDetails(service.serviceId)); // Fetch service details
-    }
+  const handleAccordionToggle = (bookingId) => (event, isExpanded) => {
+    setExpanded(isExpanded ? bookingId : false);
   };
 
   if (!Array.isArray(bookings) || bookings.length === 0) {
@@ -136,45 +106,37 @@ const BookingCardView = ({ bookings }) => {
 
             <StyledAccordion
               expanded={expanded === booking.bookingId}
-              onChange={handleAccordionToggle(booking.bookingId, booking.services)}
+              onChange={handleAccordionToggle(booking.bookingId)}
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="body2">View Services and Stylists</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {booking?.services?.map((service) => {
-                  const details = serviceDetails[service.serviceId];
-
-                  return (
-                    <Box
-                      key={service.serviceId}
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        mb: 2,
-                        p: 1,
-                        borderRadius: 1,
-                        backgroundColor: 'background.paper',
-                      }}
-                    >
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {service.serviceName}
-                        </Typography>
-                        <Typography variant="body2">with {service.stylistName}</Typography>
-                      </Box>
-                      {details ? (
-                        <Box sx={{ textAlign: 'right' }}>
-                          <Typography variant="body2">Price: ${details.price}</Typography>
-                          <Typography variant="body2">Estimate Time: {details.estimateTime}</Typography>
-                        </Box>
-                      ) : (
-                        <CircularProgress size={20} />
-                      )}
+                {booking?.services?.map((service) => (
+                  <Box
+                    key={service.serviceId}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mb: 2,
+                      p: 1,
+                      borderRadius: 1,
+                      backgroundColor: 'background.paper',
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                        {service.serviceName}
+                      </Typography>
+                      <Typography variant="body2">with {service.stylistName}</Typography>
                     </Box>
-                  );
-                })}
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="body2">Total Price: ${booking.totalPrice}</Typography>
+                      <Typography variant="body2">Duration: {booking.service}</Typography>
+                    </Box>
+                  </Box>
+                ))}
               </AccordionDetails>
             </StyledAccordion>
 
@@ -187,9 +149,6 @@ const BookingCardView = ({ bookings }) => {
             <Button size="small" variant="contained" color="primary">
               Rebook
             </Button>
-            <IconButton size="small" color="inherit">
-              <MoreVertIcon />
-            </IconButton>
           </CardActions>
         </Card>
       ))}
