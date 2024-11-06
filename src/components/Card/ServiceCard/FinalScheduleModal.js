@@ -18,7 +18,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from 'react-redux';
 import { getVoucherList } from '@/redux/slice/voucherSlice';
 import { createBooking } from '@/redux/slice/userBooking';
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => {
   const dispatch = useDispatch();
   const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
@@ -57,10 +58,10 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
     const bookingPayload = {
       userName: isAuthenticated ? user.fullName : name,
       phone: isAuthenticated ? user.phone : phone,
-      voucherId: selectedVoucher ? selectedVoucher : null,
-      scheduleId: Array.from(new Set(bookingData.flatMap((item) => item.schedules))), // Ensure unique schedule IDs
-      serviceId: bookingData.map((item) => item.service.serviceId),
-      stylistId: bookingData.map((item) => item.stylist.stylistId),
+      voucherId: isAuthenticated && selectedVoucher ? selectedVoucher : null,
+      scheduleId: Array.from(new Set(bookingData.flatMap((item) => item.schedules))) || [],
+      serviceId: bookingData.map((item) => item.service.serviceId) || [],
+      stylistId: bookingData.map((item) => item.stylist.stylistId) || [],
     };
 
     console.log('Payload being sent to createBooking:', bookingPayload);
@@ -68,14 +69,14 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
     try {
       const resultAction = await dispatch(createBooking(bookingPayload));
       if (createBooking.fulfilled.match(resultAction)) {
-        console.log('Booking created successfully');
+        toast.success('Booking created successfully');
         onClose();
       } else {
         throw new Error(resultAction.payload || 'Unknown error.');
       }
     } catch (error) {
       console.error('Error creating booking:', error);
-      alert('Booking failed. Please try again.');
+      toast.error('Booking failed. Please try again.');
     }
   };
 
