@@ -3,9 +3,10 @@ import Cookies from 'js-cookie';
 
 const getAllReport = async () => {
   try {
+    const token = Cookies.get('authToken');
     const response = await axios.get('api/v1/reports/reportList', {
       headers: {
-        accept: '*/*',
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;

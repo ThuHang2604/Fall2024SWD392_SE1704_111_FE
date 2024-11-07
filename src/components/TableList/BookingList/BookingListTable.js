@@ -36,6 +36,17 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// Status mapping
+const statusMapping = {
+  0: 'None',
+  1: 'InQueue',
+  2: 'Accepted',
+  3: 'InProgress',
+  4: 'Delay',
+  5: 'Complete',
+  6: 'Cancel',
+};
+
 function BookingListTable({ bookingList = [], fetchBookings }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -82,7 +93,7 @@ function BookingListTable({ bookingList = [], fetchBookings }) {
 
   const handleCheckIn = async () => {
     if (setSelectedBookingId) {
-      checkIn(selectedBookingId, 0)
+      checkIn(selectedBookingId, 2)
         .then((response) => {
           toast.success('Check in booking successfully!');
           handleCloseDialog();
@@ -127,7 +138,7 @@ function BookingListTable({ bookingList = [], fetchBookings }) {
                 <StyledTableCell>{booking.customerId}</StyledTableCell>
                 <StyledTableCell>{booking.staffId}</StyledTableCell>
                 <StyledTableCell>{booking.scheduleId}</StyledTableCell>
-                <StyledTableCell>{booking.status}</StyledTableCell>
+                <StyledTableCell>{statusMapping[booking.status]}</StyledTableCell> {/* Use statusMapping */}
                 <StyledTableCell>{new Date(booking.createDate).toLocaleString()}</StyledTableCell>
                 <StyledTableCell>
                   {/* Check In Button */}
