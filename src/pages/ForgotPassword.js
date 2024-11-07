@@ -1,18 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useDispatch, useSelector } from 'react-redux';
 import { forgetPass } from '@/api/UserApi';
 
 function ForgetPassword() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  const { isLoading, error, forgetPassSuccess } = useSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState(false);
 
   const INITIAL_FORM_STATE = {
     userName: '',
@@ -25,22 +22,22 @@ function ForgetPassword() {
   });
 
   const handleSubmitforgetPass = async (values, { setSubmitting }) => {
-    await dispatch(forgetPass(values)); // Chờ đợi yêu cầu hoàn tất
-    setSubmitting(false); // Đặt lại trạng thái isSubmitting về false
-  };
+    setIsLoading(true);
+    const result = await forgetPass(values);
+    setIsLoading(false);
+    setSubmitting(false);
 
-  useEffect(() => {
-    if (forgetPassSuccess) {
-      toast.success('Password reset successful');
-      navigate('/login');
-    } else if (error) {
-      if (error.response && error.response.status === 404) {
-        toast.error('User not found. Please check your email and try again.');
-      } else {
-        toast.error(`Password reset failed: ${error.message || 'An unexpected error occurred'}`);
-      }
+    if (result.status === 1) {
+      toast.success(result.message || 'Password reset successful');
+      setTimeout(() => {
+        navigate('/login');
+      }, 1000);
+    } else if (result.status === -1) {
+      toast.error(result.message);
+    } else {
+      toast.error(result.error || 'Password reset failed: An unexpected error occurred');
     }
-  }, [forgetPassSuccess, error, navigate]);
+  };
 
   return (
     <Container maxWidth={false} disableGutters>
@@ -115,7 +112,7 @@ function ForgetPassword() {
                     variant="contained"
                     color="primary"
                     type="submit"
-                    disabled={isLoading || isSubmitting} // Chỉ vô hiệu hóa khi đang gửi yêu cầu
+                    disabled={isLoading || isSubmitting}
                     sx={{ mt: 3 }}
                   >
                     {isLoading ? 'Loading...' : 'Reset Password'}

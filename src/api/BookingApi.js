@@ -16,7 +16,12 @@ const createBooking = async (bookingData) => {
 
 const getBookingList = async () => {
   try {
-    const response = await axios.get(`api/v1/booking/bookingList`);
+    const token = Cookies.get('authToken');
+    const response = await axios.get('api/v1/booking/bookingList', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     throw error;

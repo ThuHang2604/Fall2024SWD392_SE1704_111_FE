@@ -37,7 +37,7 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
         toast.success('Report created successfully');
         setTimeout(() => {
           navigate('/report-list');
-        }, 2000);
+        }, 1000);
         handleClose();
       } else {
         toast.error(`Failed to create report: ${response.message}`);

@@ -7,18 +7,15 @@ const forgetPass = async (userData) => {
         'Content-Type': 'application/json-patch+json',
       },
     });
-    return response.data;
+    return { status: 1, data: response.data };
   } catch (error) {
-    // Kiểm tra nếu lỗi là 404 và không ghi log stack trace
     if (error.response && error.response.status === 404) {
-      return {
-        status: -1,
-        message: 'User not found.',
-      };
+      return { status: -1, message: 'User not found.' };
     }
-    // Ghi log các lỗi khác
-    console.error('Error creating report:', error);
-    throw error;
+    return {
+      status: 0,
+      message: error.response?.data?.message || 'An unexpected error occurred',
+    };
   }
 };
 
