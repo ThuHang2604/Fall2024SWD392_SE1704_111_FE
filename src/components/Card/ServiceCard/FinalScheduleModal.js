@@ -18,8 +18,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from 'react-redux';
 import { getVoucherList } from '@/redux/slice/voucherSlice';
 import { createBooking } from '@/redux/slice/userBooking';
+import { fetchScheduleById } from '@/redux/slice/scheduleSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => {
   const dispatch = useDispatch();
   const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
@@ -30,6 +32,28 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
   const [totalPrice, setTotalPrice] = useState(0);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [scheduleDetails, setScheduleDetails] = useState({});
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const schedules = {};
+      for (const item of bookingData) {
+        if (Array.isArray(item.schedules)) {
+          // Check if item.schedules is an array
+          for (const scheduleId of item.schedules) {
+            if (!schedules[scheduleId]) {
+              const result = await dispatch(fetchScheduleById(scheduleId));
+              if (result.payload) {
+                schedules[scheduleId] = result.payload;
+              }
+            }
+          }
+        }
+      }
+      setScheduleDetails(schedules);
+    };
+    fetchSchedules();
+  }, [bookingData, dispatch]);
 
   useEffect(() => {
     if (open && isAuthenticated) {
@@ -42,7 +66,7 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
   }, [open, dispatch, isAuthenticated, user]);
 
   useEffect(() => {
-    const total = bookingData.reduce((acc, item) => acc + item.service.price, 0);
+    const total = bookingData.reduce((acc, item) => acc + (item.service?.price || 0), 0);
     setTotalPrice(total);
   }, [bookingData]);
 
@@ -59,12 +83,10 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
       userName: isAuthenticated ? user.fullName : name,
       phone: isAuthenticated ? user.phone : phone,
       voucherId: isAuthenticated && selectedVoucher ? selectedVoucher : null,
-      scheduleId: Array.from(new Set(bookingData.flatMap((item) => item.schedules))) || [],
-      serviceId: bookingData.map((item) => item.service.serviceId) || [],
-      stylistId: bookingData.map((item) => item.stylist.stylistId) || [],
+      scheduleId: Array.from(new Set(bookingData.flatMap((item) => item.schedules || []))) || [],
+      serviceId: bookingData.map((item) => item.service?.serviceId || '') || [],
+      stylistId: bookingData.map((item) => item.stylist?.stylistId || '') || [],
     };
-
-    console.log('Payload being sent to createBooking:', bookingPayload);
 
     try {
       const resultAction = await dispatch(createBooking(bookingPayload));
@@ -87,7 +109,6 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
           Appointment Summary
         </Typography>
 
-        {/* Name and Phone input fields */}
         <TextField
           label="Name"
           value={name}
@@ -112,7 +133,22 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
             <ListItem key={index}>
               <ListItemText
                 primary={`${item?.service?.serviceName} with ${item?.stylist?.stylistName}`}
-                secondary={`Scheduled: ${item.schedules?.map((scheduleId) => `#${scheduleId}`).join(', ')} | ${item.service.estimateTime} min | $${item.service.price}`}
+                secondary={
+                  <>
+                    {/* Get the corresponding schedule for this service by index */}
+                    {item.schedules && item.schedules[index] ? (
+                      <Typography variant="body2">
+                        Schedule: {scheduleDetails[item.schedules[index]]?.data?.startTime || 'N/A'} -{' '}
+                        {scheduleDetails[item.schedules[index]]?.data?.endTime || 'N/A'}
+                      </Typography>
+                    ) : (
+                      <Typography variant="body2">Schedule: N/A</Typography>
+                    )}
+                    <Typography variant="body2">
+                      Duration: {item.service?.estimateTime} min | Price: ${item.service?.price}
+                    </Typography>
+                  </>
+                }
               />
               <IconButton edge="end" onClick={() => onRemoveService(index)}>
                 <DeleteIcon color="error" />
