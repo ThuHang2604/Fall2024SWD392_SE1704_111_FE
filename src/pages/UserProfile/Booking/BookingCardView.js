@@ -112,9 +112,9 @@ const BookingCardView = ({ bookings }) => {
                 <Typography variant="body2">View Services and Stylists</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                {booking?.services?.map((service) => (
+                {booking?.services?.map((service, index) => (
                   <Box
-                    key={service.serviceId}
+                    key={`${service.serviceId}-${index}`} // Use index to differentiate duplicate services
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -132,8 +132,13 @@ const BookingCardView = ({ bookings }) => {
                       <Typography variant="body2">with {service.stylistName}</Typography>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
-                      <Typography variant="body2">Total Price: ${booking.totalPrice}</Typography>
-                      <Typography variant="body2">Duration: {booking.service}</Typography>
+                      <Typography variant="body2">Price: ${service.price}</Typography>
+                      {/* Display the corresponding schedule for each service */}
+                      {booking?.schedules?.[index] && (
+                        <Typography variant="body2">
+                          Schedule: {booking.schedules[index].startTime} - {booking.schedules[index].endTime}
+                        </Typography>
+                      )}
                     </Box>
                   </Box>
                 ))}

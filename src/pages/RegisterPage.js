@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
@@ -14,14 +13,14 @@ import {
   Container,
   Box,
 } from '@mui/material';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../redux/slice/authSlice';
 
 function RegisterPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, error } = useSelector((state) => state.auth);
+  const { isLoading } = useSelector((state) => state.auth);
 
   const INITIAL_FORM_STATE = {
     userName: '',
@@ -34,54 +33,82 @@ function RegisterPage() {
     dateOfBirth: '',
   };
 
-  const FORM_VALIDATION = Yup.object().shape({
-    userName: Yup.string().required('Username is required'),
-    phone: Yup.string()
-      .matches(/^\d{10}$/, 'Phone number must be exactly 10 digits')
-      .required('Phone number is required'),
-    password: Yup.string().required('Password is required'),
-    fullName: Yup.string().required('Full Name is required'),
-    email: Yup.string()
-      .email('Invalid email format')
-      .matches(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, 'Email must be a valid Gmail address ( abc@gmail.com)')
-      .required('Email is required'),
-    gender: Yup.string().oneOf(['0', '1'], 'Gender is required').required('Gender is required'),
-    address: Yup.string().required('Address is required'),
-    dateOfBirth: Yup.date()
-      .required('Date of birth is required')
-      .test('age', 'You must be at least 18 years old', function (value) {
-        const today = new Date();
-        const birthDate = new Date(value);
-        const age = today.getFullYear() - birthDate.getFullYear();
-        const monthDifference = today.getMonth() - birthDate.getMonth();
-        const dayDifference = today.getDate() - birthDate.getDate();
-        if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
-          return age - 1 >= 18;
-        }
-        return age >= 18;
-      }),
-  });
-
   const handleSubmitRegister = async (values) => {
-    console.log('Register Data:', values); // Add this line
+    // Custom validation logic with toasts
+    if (!values.userName) {
+      toast.error('Username is required');
+      return;
+    }
+    if (!values.phone || !/^\d{10}$/.test(values.phone)) {
+      toast.error('Phone number must be exactly 10 digits');
+      return;
+    }
+    if (!values.password) {
+      toast.error('Password is required');
+      return;
+    }
+    if (!values.fullName) {
+      toast.error('Full Name is required');
+      return;
+    }
+    if (!values.email || !/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(values.email)) {
+      toast.error('Email must be a valid Gmail address');
+      return;
+    }
+    if (!values.gender || !['0', '1'].includes(values.gender)) {
+      toast.error('Gender is required');
+      return;
+    }
+    if (!values.address) {
+      toast.error('Address is required');
+      return;
+    }
+    if (!values.dateOfBirth) {
+      toast.error('Date of birth is required');
+      return;
+    }
 
-    const resultAction = await dispatch(
-      registerUser({
-        ...values,
-        gender: parseInt(values.gender, 10), // Convert gender to an integer
-        userName: values.userName, // Sửa lại đúng tên trường 'userName'
-      }),
-    );
+    const today = new Date();
+    const birthDate = new Date(values.dateOfBirth);
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    const dayDifference = today.getDate() - birthDate.getDate();
+    const adjustedAge = monthDifference < 0 || (monthDifference === 0 && dayDifference < 0) ? age - 1 : age;
 
-    if (registerUser.fulfilled.match(resultAction)) {
-      toast.success('Your account has been successfully registered. Please log in to continue.');
-      navigate('/login');
-    } else {
-      if (resultAction.payload) {
-        toast.error(resultAction.payload);
+    if (adjustedAge < 18) {
+      toast.error('You must be at least 18 years old');
+      return;
+    } else if (adjustedAge > 100) {
+      toast.error('Age must be less than or equal to 100 years');
+      return;
+    }
+
+    // Dispatch registration action
+    try {
+      const resultAction = await dispatch(
+        registerUser({
+          ...values,
+          gender: parseInt(values.gender, 10),
+        }),
+      );
+
+      if (registerUser.fulfilled.match(resultAction)) {
+        const { status, message } = resultAction.payload;
+        if (status === 1) {
+          toast.success(message, {
+            autoClose: 2000, // 2 seconds
+            onClose: () => setTimeout(() => navigate('/login'), 2000),
+          });
+        } else {
+          toast.error(message || 'Account registration failed. Please try again.');
+        }
       } else {
-        toast.error('Account registration failed. Please check your information and try again.');
+        toast.error(
+          resultAction.payload || 'Account registration failed. Please check your information and try again.',
+        );
       }
+    } catch (error) {
+      toast.error('An unexpected error occurred. Please try again later.');
     }
   };
 
@@ -115,37 +142,34 @@ function RegisterPage() {
 
         <Formik
           initialValues={INITIAL_FORM_STATE}
-          validationSchema={FORM_VALIDATION}
-          onSubmit={handleSubmitRegister}
-          validateOnChange={true}
-          validateOnBlur={true}
+          onSubmit={(values, { setSubmitting }) => {
+            handleSubmitRegister(values);
+            setSubmitting(false);
+          }}
+          validateOnChange={false}
+          validateOnBlur={false}
         >
           {({ isSubmitting }) => (
             <Form>
               <Field name="userName">
-                {({ field }) => <TextField fullWidth margin="normal" label="UserName" {...field} />}
+                {({ field }) => <TextField fullWidth margin="normal" label="Username" {...field} />}
               </Field>
-              <ErrorMessage name="userName" component="div" className="text-danger" />
 
               <Field name="phone">
                 {({ field }) => <TextField fullWidth margin="normal" label="Phone number" {...field} />}
               </Field>
-              <ErrorMessage name="phone" component="div" className="text-danger" />
 
               <Field name="password">
                 {({ field }) => <TextField fullWidth margin="normal" label="Password" type="password" {...field} />}
               </Field>
-              <ErrorMessage name="password" component="div" className="text-danger" />
 
               <Field name="fullName">
                 {({ field }) => <TextField fullWidth margin="normal" label="Full Name" {...field} />}
               </Field>
-              <ErrorMessage name="fullName" component="div" className="text-danger" />
 
               <Field name="email">
                 {({ field }) => <TextField fullWidth margin="normal" label="Email" {...field} />}
               </Field>
-              <ErrorMessage name="email" component="div" className="text-danger" />
 
               <FormControl fullWidth margin="normal">
                 <InputLabel>Gender</InputLabel>
@@ -153,13 +177,11 @@ function RegisterPage() {
                   <MenuItem value="0">Male</MenuItem>
                   <MenuItem value="1">Female</MenuItem>
                 </Field>
-                <ErrorMessage name="gender" component="div" className="text-danger" />
               </FormControl>
 
               <Field name="address">
                 {({ field }) => <TextField fullWidth margin="normal" label="Address" {...field} />}
               </Field>
-              <ErrorMessage name="address" component="div" className="text-danger" />
 
               <Field name="dateOfBirth">
                 {({ field }) => (
@@ -173,7 +195,6 @@ function RegisterPage() {
                   />
                 )}
               </Field>
-              <ErrorMessage name="dateOfBirth" component="div" className="text-danger" />
 
               <Button
                 fullWidth
