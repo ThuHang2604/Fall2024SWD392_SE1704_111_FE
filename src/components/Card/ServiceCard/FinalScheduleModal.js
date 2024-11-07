@@ -21,7 +21,13 @@ import { createBooking } from '@/redux/slice/userBooking';
 import { fetchScheduleById } from '@/redux/slice/scheduleSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
 const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => {
   const dispatch = useDispatch();
   const { vouchers = [], isLoading } = useSelector((state) => state.voucher);
@@ -137,10 +143,16 @@ const FinalScheduleModal = ({ open, onClose, bookingData, onRemoveService }) => 
                   <>
                     {/* Get the corresponding schedule for this service by index */}
                     {item.schedules && item.schedules[index] ? (
-                      <Typography variant="body2">
-                        Schedule: {scheduleDetails[item.schedules[index]]?.data?.startTime || 'N/A'} -{' '}
-                        {scheduleDetails[item.schedules[index]]?.data?.endTime || 'N/A'}
-                      </Typography>
+                      <div>
+                        <Typography variant="body2">
+                          Schedule: {scheduleDetails[item.schedules[index]]?.data?.startTime || 'N/A'} -{' '}
+                          {scheduleDetails[item.schedules[index]]?.data?.endTime || 'N/A'}
+                        </Typography>
+                        <Typography variant="body2">
+                          {' '}
+                          on : {`${formatDate(scheduleDetails[item.schedules[index]]?.data?.startDate)}`}
+                        </Typography>
+                      </div>
                     ) : (
                       <Typography variant="body2">Schedule: N/A</Typography>
                     )}

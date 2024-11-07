@@ -3,6 +3,14 @@ import { Modal, Box, Typography, Select, MenuItem, Button } from '@mui/material'
 import { getScheduleList } from '@/api/ScheduleApi';
 import './styles.css';
 
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
@@ -23,9 +31,8 @@ const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
   };
 
   const handleScheduleSelect = (event) => {
-    // Update selected schedules and ensure uniqueness
     const value = event.target.value;
-    const uniqueSchedules = Array.from(new Set(value)); // Remove duplicates
+    const uniqueSchedules = Array.from(new Set(value));
     setSelectedSchedules(uniqueSchedules);
   };
 
@@ -47,7 +54,7 @@ const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
         <Select multiple value={selectedSchedules} onChange={handleScheduleSelect} fullWidth>
           {schedules.map((schedule) => (
             <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
-              {`From ${schedule.startTime} to ${schedule.endTime}`}
+              {`From ${formatDate(schedule.startDate)} - ${schedule.startTime} to ${schedule.endTime}`}
             </MenuItem>
           ))}
         </Select>
