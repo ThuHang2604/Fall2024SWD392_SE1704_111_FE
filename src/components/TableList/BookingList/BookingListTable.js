@@ -142,7 +142,7 @@ function BookingListTable({ bookingList = [], fetchBookings }) {
                 <StyledTableCell>{new Date(booking.createDate).toLocaleString()}</StyledTableCell>
                 <StyledTableCell>
                   {/* Check In Button */}
-                  <Button
+                  {/* <Button
                     variant="contained"
                     color="success"
                     size="small"
@@ -150,7 +150,7 @@ function BookingListTable({ bookingList = [], fetchBookings }) {
                     style={{ marginRight: 10 }}
                   >
                     Check In
-                  </Button>
+                  </Button> */}
                   {/* Create report button */}
                   <Button
                     variant="contained"

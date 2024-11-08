@@ -151,9 +151,9 @@ const BookingCardView = ({ bookings }) => {
           </CardContent>
 
           <CardActions sx={{ justifyContent: 'space-between' }}>
-            <Button size="small" variant="contained" color="primary">
+            {/* <Button size="small" variant="contained" color="primary">
               Rebook
-            </Button>
+            </Button> */}
           </CardActions>
         </Card>
       ))}
