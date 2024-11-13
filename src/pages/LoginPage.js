@@ -6,17 +6,16 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Container, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { jwtDecode } from 'jwt-decode'; // Import jwt-decode
+import { jwtDecode } from 'jwt-decode';
 import { loginUser } from '../redux/slice/authSlice';
 
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Lấy dữ liệu từ Redux store
   const { isLoading, isAuthenticated, error, token } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
-  const [decodedToken, setDecodedToken] = useState(null); // State để lưu trữ JWT đã decode
+  const [decodedToken, setDecodedToken] = useState(null);
 
   const INITIAL_FORM_STATE = {
     username: '',
@@ -32,17 +31,16 @@ function LoginPage() {
     setShowPassword((prev) => !prev);
   };
 
-  const handleSubmitLogin = (values) => {
-    dispatch(loginUser(values));
+  const handleSubmitLogin = async (values, { setSubmitting }) => {
+    await dispatch(loginUser(values)); // Dispatch login action
+    setSubmitting(false);
   };
 
-  // Decode token và lưu trữ thông tin sau khi đăng nhập thành công
   useEffect(() => {
     if (isAuthenticated && token) {
       const decoded = jwtDecode(token);
       setDecodedToken(decoded);
 
-      // Điều hướng tới trang khác sau khi đăng nhập thành công dựa trên vai trò
       if (decoded.role === 'Customer') {
         navigate('/', { replace: true });
       } else if (decoded.role === 'Stylist') {
@@ -51,11 +49,11 @@ function LoginPage() {
     }
   }, [isAuthenticated, token, navigate]);
 
-  useEffect(() => {
-    if (error) {
-      toast.error(error);
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     toast.error(error);
+  //   }
+  // }, [error]);
 
   return (
     <Container maxWidth={false} disableGutters>
@@ -134,8 +132,6 @@ function LoginPage() {
                         Not a member? <Link to="/register">Sign Up</Link>
                       </Typography>
                     </Box>
-
-                    <ToastContainer position="top-right" autoClose={3000} />
                   </Form>
                 )}
               </Formik>
@@ -143,6 +139,7 @@ function LoginPage() {
           </CardContent>
         </Card>
       </Box>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Container>
   );
 }

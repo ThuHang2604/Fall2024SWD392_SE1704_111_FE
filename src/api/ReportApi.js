@@ -1,10 +1,12 @@
 import axios from './axios';
+import Cookies from 'js-cookie';
 
 const getAllReport = async () => {
   try {
+    const token = Cookies.get('authToken');
     const response = await axios.get('api/v1/reports/reportList', {
       headers: {
-        accept: '*/*',
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -15,10 +17,13 @@ const getAllReport = async () => {
 
 const createReport = async (reportData) => {
   try {
+    const token = Cookies.get('authToken');
+
     const response = await axios.post('api/v1/reports/createReport', reportData, {
       headers: {
         accept: '*/*',
         'Content-Type': 'application/json-patch+json',
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -29,10 +34,13 @@ const createReport = async (reportData) => {
 
 const updateReport = async (reportId, reportData) => {
   try {
+    const token = Cookies.get('authToken');
+
     const response = await axios.post(`api/v1/reports/updateReport/${reportId}`, reportData, {
       headers: {
         accept: '*/*',
         'Content-Type': 'application/json-patch+json',
+        Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -44,6 +52,9 @@ const updateReport = async (reportId, reportData) => {
 // Hàm thay đổi trạng thái báo cáo
 const removeReport = async (reportId, status) => {
   try {
+    const token = Cookies.get('authToken');
+    console.log('token', token);
+
     const response = await axios.post(
       `api/v1/reports/changeReportStatus/${reportId}`,
       { status },
@@ -51,6 +62,7 @@ const removeReport = async (reportId, status) => {
         headers: {
           accept: '*/*',
           'Content-Type': 'application/json-patch+json',
+          Authorization: `Bearer ${token}`,
         },
       },
     );

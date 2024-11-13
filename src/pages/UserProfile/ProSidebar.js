@@ -45,9 +45,17 @@ const ProfileSidebar = () => {
         </Typography>
       </Box>
 
-      <Button variant="outlined" fullWidth sx={{ mt: 4 }} onClick={handleLogout}>
-        Logout
-      </Button>
+      <div>
+        <Button
+          variant="contained"
+          fullWidth
+          sx={{ mt: 4 }}
+          onClick={handleLogout}
+          style={{ width: '100px', justifyItems: 'center' }}
+        >
+          Logout
+        </Button>
+      </div>
 
       <Box sx={{ mt: 4 }}>
         <NavLink
@@ -82,6 +90,17 @@ const ProfileSidebar = () => {
           })}
         >
           My Bookings
+        </NavLink>
+        <NavLink
+          to="/user/feedback"
+          style={({ isActive }) => ({
+            display: 'block',
+            marginBottom: '16px',
+            color: isActive ? 'red' : 'inherit',
+            textDecoration: 'none',
+          })}
+        >
+          Feed back
         </NavLink>
       </Box>
     </Box>

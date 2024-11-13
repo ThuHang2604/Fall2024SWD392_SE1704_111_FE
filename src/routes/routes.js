@@ -9,7 +9,7 @@ import PaymentPage from '@/pages/PaymentPage';
 import ServiceList from '@/pages/Stylist/ServiceListPage';
 import ProfilePage from '@/pages/UserProfile/Profile';
 import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
-import UserBooking from '@/pages/UserProfile/UserBooking';
+// import UserBooking from '@/pages/UserProfile/UserBooking';
 import ReportListPage from '@/pages/Stylist/ReportListPage';
 import BookingListPage from '@/pages/Stylist/BookingListPage';
 
@@ -25,7 +25,7 @@ const publicRoutes = [
     component: LoginPage,
   },
   {
-    title: 'Login',
+    title: 'Forget Password',
     path: '/forgot-password',
     component: ForgotPassword,
   },
@@ -53,11 +53,6 @@ const publicRoutes = [
     title: 'Subscriptions',
     path: '/subscriptions',
     component: SubscriptionsPage,
-  },
-  {
-    title: 'UserBooking',
-    path: '/user-booking',
-    component: UserBooking,
   },
 ];
 

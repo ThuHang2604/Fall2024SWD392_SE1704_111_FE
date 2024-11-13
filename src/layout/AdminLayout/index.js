@@ -14,6 +14,7 @@ import BookOnlineIcon from '@mui/icons-material/BookOnline';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
+import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
 
 const NAVIGATION = [
   {
@@ -84,6 +85,7 @@ function DashboardLayoutAccount(props) {
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const role = user?.role;
+  const profile = useSelector((state) => state.userProfile.user);
 
   const handleLogout = () => {
     dispatch(logoutUser());
@@ -95,6 +97,12 @@ function DashboardLayoutAccount(props) {
     }
   }, [isAuthenticated, navigate]);
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getUserProfileCurrent());
+    }
+  }, [dispatch, isAuthenticated]);
+
   const router = React.useMemo(() => {
     return {
       navigate,
@@ -105,8 +113,8 @@ function DashboardLayoutAccount(props) {
     <AppProvider
       session={{
         user: {
-          name: user?.name || 'Bharat Kashyap',
-          email: user?.email || 'bharatkashyap@outlook.com',
+          name: profile?.fullName || 'Bharat Kashyap',
+          email: profile?.email || 'bharatkashyap@outlook.com',
           image: <AccountCircleIcon />,
         },
       }}

@@ -75,9 +75,19 @@ const ProfilePage = () => {
 
   const handleSubmit = async () => {
     const profileData = {
-      userProfileId: user.userProfileId, // Include userProfileId for update
-      ...formData,
+      userProfileId: user.userProfileId,
+      fullName: formData.fullName,
+      email: formData.email,
+      gender: formData.gender,
+      address: formData.address,
+      dateOfBirth: formData.dateOfBirth,
+      phone: formData.phone,
     };
+
+    // Only include imageLink if there is a valid image URL
+    if (formData.imageLink) {
+      profileData.imageLink = formData.imageLink;
+    }
 
     try {
       setLoading(true);
@@ -126,7 +136,7 @@ const ProfilePage = () => {
             textAlign: 'left',
           }}
         >
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
+          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy' }}>
             ACCOUNT
           </Typography>
           <Typography variant="body1" gutterBottom>

@@ -4,17 +4,25 @@ import storage from 'redux-persist/lib/storage';
 import authReducer from './slice/authSlice';
 import userProfileReducer from './slice/userProfileSlice';
 import bookingReducer from './slice/userBooking';
+import voucherReducer from './slice/voucherSlice';
+import hairServiceReducer from './slice/hairServiceSlice';
+import feedbackReducer from './slice/feedbackSlice';
+import scheduleReducer from './slice/scheduleSlice';
 const persistConfig = {
   key: 'root',
   storage,
   version: 1,
-  whitelist: ['auth', 'userProfile'],
+  whitelist: ['auth', 'userProfile', 'voucher', 'feedback', 'schedule'],
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   userProfile: userProfileReducer,
   booking: bookingReducer,
+  voucher: voucherReducer,
+  hairService: hairServiceReducer,
+  feedBack: feedbackReducer,
+  schedule: scheduleReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);

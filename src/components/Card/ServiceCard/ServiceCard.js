@@ -1,45 +1,37 @@
 import React, { useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Button, Grid } from '@mui/material';
 import BookingModal from '@/components/Modal/BookingModal/BookingModal2';
-import CartModal from '@/components/Modal/CartModal/CartModal';
 import FinalScheduleModal from '@/components/Card/ServiceCard/FinalScheduleModal';
-import { Hair } from '@/pages/home/img/hair.jpg';
-function ServiceCard({ serviceCard }) {
-  const [modalOpen, setModalOpen] = useState(false); // Booking Modal
-  const [cartModalOpen, setCartModalOpen] = useState(false); // Appointment Summary Modal
-  const [finalModalOpen, setFinalModalOpen] = useState(false); // Final Schedule Modal
-  const [selectedService, setSelectedService] = useState(null); // Currently selected service
-  const [bookingData, setBookingData] = useState([]); // List of all booked services
+import CartModal from '@/components/Modal/CartModal/CartModal';
+import Hair from '@/pages/home/img/hair.jpg';
 
-  // Handle selecting a service
+function ServiceCard({ serviceCard }) {
+  const [modalOpen, setModalOpen] = useState(false); // Booking (Stylist) Modal
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false); // Schedule Modal
+  const [cartModalOpen, setCartModalOpen] = useState(false); // Final Summary Modal
+  const [selectedService, setSelectedService] = useState(null); // Selected service
+  const [bookingData, setBookingData] = useState([]); // List of booked services
+
   const handleSelectService = (service) => {
     setSelectedService(service);
-    setModalOpen(true); // Open Booking Modal
+    setModalOpen(true);
   };
 
-  // Handle adding a service after stylist selection
-  const handleNext = (data) => {
+  const handleStylistNext = (data) => {
     setBookingData((prev) => [...prev, data]);
-    setModalOpen(false); // Close Booking Modal
-    setCartModalOpen(true); // Open Cart Modal (Appointment Summary)
+    setModalOpen(false);
+    setScheduleModalOpen(true); // Open Schedule Modal next
   };
 
-  // Remove a service from the booking list
+  const handleScheduleNext = (updatedBookingData) => {
+    setBookingData(updatedBookingData); // Update booking data with schedules
+    setScheduleModalOpen(false);
+    setCartModalOpen(true); // Open Cart (Summary) Modal next
+  };
+
   const handleRemoveService = (index) => {
     const updatedBookingData = bookingData.filter((_, i) => i !== index);
     setBookingData(updatedBookingData);
-  };
-
-  // Handle opening the Final Schedule Modal
-  const handleOpenFinalModal = () => {
-    setCartModalOpen(false); // Close Cart Modal
-    setFinalModalOpen(true); // Open Final Schedule Modal
-  };
-
-  // Handle going back to the Appointment Summary from Final Schedule Modal
-  const handleBackToSummary = () => {
-    setFinalModalOpen(false); // Close Final Schedule Modal
-    setCartModalOpen(true); // Re-open Cart Modal (Appointment Summary)
   };
 
   return (
@@ -48,7 +40,7 @@ function ServiceCard({ serviceCard }) {
         {serviceCard.map((service) => (
           <Grid item xs={12} sm={6} md={4} key={service.serviceId}>
             <Card>
-              <CardMedia component="img" height="140" image={service.imageLink} alt={service.serviceName} />
+              <CardMedia component="img" height="140" image={Hair} alt={service.serviceName} />
               <CardContent>
                 <Typography gutterBottom variant="h5" component="h2">
                   {service.serviceName}
@@ -66,29 +58,29 @@ function ServiceCard({ serviceCard }) {
         ))}
       </Grid>
 
-      {/* Booking Modal */}
+      {/* Stylist (Booking) Modal */}
       <BookingModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         service={selectedService}
-        onNext={handleNext}
+        onNext={handleStylistNext}
       />
 
-      {/* Appointment Summary (CartModal) */}
+      {/* Schedule Modal */}
       <CartModal
+        open={scheduleModalOpen}
+        onClose={() => setScheduleModalOpen(false)}
+        bookingData={bookingData}
+        setBookingData={setBookingData}
+        onNext={handleScheduleNext}
+      />
+
+      {/* Final Summary (CartModal) */}
+      <FinalScheduleModal
         open={cartModalOpen}
         onClose={() => setCartModalOpen(false)}
         bookingData={bookingData}
         onRemoveService={handleRemoveService}
-        onScheduleAppointment={handleOpenFinalModal} // Open Final Modal
-      />
-
-      {/* Final Schedule Modal */}
-      <FinalScheduleModal
-        open={finalModalOpen}
-        onClose={() => setFinalModalOpen(false)}
-        bookingData={bookingData}
-        onBack={handleBackToSummary} // Handle Back button
       />
     </Container>
   );

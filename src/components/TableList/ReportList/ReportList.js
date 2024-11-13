@@ -2,7 +2,8 @@ import React from 'react';
 import { Box, Typography } from '@mui/material';
 import ReportListTable from './ReportListTable';
 
-function ReportList({ reportList, error }) {
+function ReportList({ reportList, error, onRefresh }) {
+  // Thêm onRefresh
   return (
     <div>
       <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40 }}>
@@ -16,7 +17,7 @@ function ReportList({ reportList, error }) {
           </Typography>
         </Box>
       ) : (
-        <ReportListTable reportList={reportList} />
+        <ReportListTable reportList={reportList} onRefresh={onRefresh} />
       )}
     </div>
   );

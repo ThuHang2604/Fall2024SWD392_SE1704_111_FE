@@ -1,36 +1,71 @@
-import React from 'react';
-import { Modal, Box, Typography, Button, List, ListItem, ListItemText, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import React, { useEffect, useState } from 'react';
+import { Modal, Box, Typography, Select, MenuItem, Button } from '@mui/material';
+import { getScheduleList } from '@/api/ScheduleApi';
+import './styles.css';
 
-const CartModal = ({ open, onClose, bookingData, onRemoveService, onScheduleAppointment }) => {
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
+  const [schedules, setSchedules] = useState([]);
+  const [selectedSchedules, setSelectedSchedules] = useState([]);
+
+  useEffect(() => {
+    if (open) {
+      fetchSchedules();
+    }
+  }, [open]);
+
+  const fetchSchedules = async () => {
+    try {
+      const response = await getScheduleList();
+      setSchedules(response.data);
+    } catch (error) {
+      console.error('Failed to fetch schedule list:', error);
+    }
+  };
+
+  const handleScheduleSelect = (event) => {
+    const value = event.target.value;
+    const uniqueSchedules = Array.from(new Set(value));
+    setSelectedSchedules(uniqueSchedules);
+  };
+
+  const handleNext = () => {
+    const updatedBookingData = bookingData.map((item) => ({
+      ...item,
+      schedules: selectedSchedules,
+    }));
+    setBookingData(updatedBookingData);
+    onNext(updatedBookingData);
+  };
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box className="modal-box">
         <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Appointment Summary
+          Select Schedule(s)
         </Typography>
-        <List>
-          {bookingData.map((item, index) => (
-            <ListItem
-              key={index}
-              secondaryAction={
-                <IconButton edge="end" aria-label="delete" onClick={() => onRemoveService(index)}>
-                  <DeleteIcon color="error" />
-                </IconButton>
-              }
-            >
-              <ListItemText
-                primary={`${item.service.serviceName} with ${item.stylist.stylistName}`}
-                secondary={`${item.service.estimateTime} min | $${item.service.price}`}
-              />
-            </ListItem>
+        <Select multiple value={selectedSchedules} onChange={handleScheduleSelect} fullWidth>
+          {schedules.map((schedule) => (
+            <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
+              {`From ${formatDate(schedule.startDate)} - ${schedule.startTime} to ${schedule.endTime}`}
+            </MenuItem>
           ))}
-        </List>
-        <Button onClick={onClose} sx={{ marginTop: 2 }} variant="text" color="primary">
-          + Add Service
-        </Button>
-        <Button onClick={onScheduleAppointment} sx={{ marginTop: 2 }} variant="contained" color="primary">
-          Schedule Appointment
+        </Select>
+        <Button
+          onClick={handleNext}
+          disabled={selectedSchedules.length === 0}
+          sx={{ marginTop: 2 }}
+          variant="contained"
+          color="primary"
+        >
+          Next
         </Button>
       </Box>
     </Modal>
