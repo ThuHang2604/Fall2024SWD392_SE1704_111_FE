@@ -18,6 +18,7 @@ const FeedbackList = () => {
     return <Typography>Redux state not available</Typography>;
   }
 
+  // console.log('feedbackState:', feedbackState);
   const { feedbacks, isLoading, error } = feedbackState;
 
   const handleOpen = () => setOpen(true);
@@ -95,10 +96,10 @@ const FeedbackList = () => {
                     <Typography variant="body1" color="inherit" gutterBottom>
                       {feedback.description || 'No Description'}
                     </Typography>
-                    <Typography variant="caption" color="inherit">
+                    {/* <Typography variant="caption" color="inherit">
                       Created by: {feedback.createBy || 'N/A'} on{' '}
                       {feedback.createDate ? new Date(feedback.createDate).toLocaleDateString() : 'N/A'}
-                    </Typography>
+                    </Typography> */}
                   </CardContent>
                 </Card>
               ))}

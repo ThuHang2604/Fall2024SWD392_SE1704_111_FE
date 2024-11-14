@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Pagination, Box, Typography, Tabs, Tab } from '@mui/material';
+import { Pagination, Box, Typography, Tabs, Tab, Backdrop, CircularProgress } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getBookingHistory } from '@/redux/slice/userProfileSlice';
 import BookingCardView from './BookingCardView';
@@ -10,18 +10,26 @@ const BookingHistoryPage = () => {
   const dispatch = useDispatch();
   const { bookingHistory, isLoading, error } = useSelector((state) => state.userProfile);
 
+  const [loading, setLoading] = useState(true); // Loading state with delay
   const [page, setPage] = useState(1); // Current page for pagination
   const [pageSize] = useState(4); // Items per page (4 bookings)
   const [paginatedBookings, setPaginatedBookings] = useState([]); // Current page's bookings
   const [tabValue, setTabValue] = useState(0); // Tab control (0 for Upcoming, 1 for Past)
 
-  // Fetch booking history on component mount
+  // Fetch booking history on component mount with a delay
   useEffect(() => {
-    dispatch(getBookingHistory())
-      .unwrap()
-      .catch((err) => {
-        toast.error(`Failed to fetch bookings: ${err.message || 'unknown error'}`);
-      });
+    const loadBookingHistory = async () => {
+      setLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for 1 second
+      dispatch(getBookingHistory())
+        .unwrap()
+        .catch((err) => {
+          toast.error(`Failed to fetch bookings: ${err.message || 'unknown error'}`);
+        })
+        .finally(() => setLoading(false));
+    };
+
+    loadBookingHistory();
   }, [dispatch]);
 
   // Filter bookings based on tab selection (Upcoming or Past)
@@ -58,51 +66,57 @@ const BookingHistoryPage = () => {
 
   return (
     <div>
-      {error ? (
-        <Typography color="error">{typeof error === 'object' ? JSON.stringify(error) : error}</Typography>
-      ) : isLoading ? (
-        <Typography>Loading...</Typography>
-      ) : (
+      <Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={loading}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
+      {!loading && (
         <>
-          <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy', mb: 3 }}>
-            MANAGE YOUR BOOKINGS
-          </Typography>
-          <Typography variant="body1" gutterBottom>
-            Review your bookings and make any needed changes.
-          </Typography>
-
-          {/* Tabs: Upcoming and Past */}
-          <Tabs value={tabValue} onChange={handleTabChange} sx={{ marginBottom: '20px' }}>
-            <Tab label="Upcoming" />
-            <Tab label="Past" />
-          </Tabs>
-
-          {/* Booking List or Placeholder */}
-          {displayBookings ? (
-            <BookingCardView bookings={paginatedBookings} />
+          {error ? (
+            <Typography color="error">{typeof error === 'object' ? JSON.stringify(error) : error}</Typography>
           ) : (
-            <Box sx={{ textAlign: 'center', marginTop: 3 }}>
-              <Typography variant="h6" color="textSecondary">
-                No booking history found.
+            <>
+              <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ fontFamily: 'Monoton, Fantasy', mb: 3 }}>
+                MANAGE YOUR BOOKINGS
               </Typography>
-              <img src="no-booking.png" alt="No bookings" style={{ maxWidth: '200px', marginTop: '20px' }} />
-            </Box>
-          )}
+              <Typography variant="body1" gutterBottom>
+                Review your bookings and make any needed changes.
+              </Typography>
 
-          {/* Pagination */}
-          {displayBookings && (
-            <Box display="flex" justifyContent="center" sx={{ marginTop: '20px' }}>
-              <Pagination
-                count={
-                  tabValue === 0
-                    ? Math.ceil(upcomingBookings.length / pageSize)
-                    : Math.ceil(pastBookings.length / pageSize)
-                }
-                page={page}
-                onChange={handlePageChange}
-                color="primary"
-              />
-            </Box>
+              {/* Tabs: Upcoming and Past */}
+              <Tabs value={tabValue} onChange={handleTabChange} sx={{ marginBottom: '20px' }}>
+                <Tab label="Upcoming" />
+                <Tab label="Past" />
+              </Tabs>
+
+              {/* Booking List or Placeholder */}
+              {displayBookings ? (
+                <BookingCardView bookings={paginatedBookings} />
+              ) : (
+                <Box sx={{ textAlign: 'center', marginTop: 3 }}>
+                  <Typography variant="h6" color="textSecondary">
+                    No booking history found.
+                  </Typography>
+                  <img src="no-booking.png" alt="No bookings" style={{ maxWidth: '200px', marginTop: '20px' }} />
+                </Box>
+              )}
+
+              {/* Pagination */}
+              {displayBookings && (
+                <Box display="flex" justifyContent="center" sx={{ marginTop: '20px' }}>
+                  <Pagination
+                    count={
+                      tabValue === 0
+                        ? Math.ceil(upcomingBookings.length / pageSize)
+                        : Math.ceil(pastBookings.length / pageSize)
+                    }
+                    page={page}
+                    onChange={handlePageChange}
+                    color="primary"
+                  />
+                </Box>
+              )}
+            </>
           )}
         </>
       )}

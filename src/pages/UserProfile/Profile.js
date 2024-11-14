@@ -6,6 +6,8 @@ import ProfileSidebar from './ProSidebar'; // Sidebar component
 import { getUserProfileCurrent, updateCurrentProfile, setPreviewImage } from '@/redux/slice/userProfileSlice';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { imageDb } from '@/components/FirebaseImage/Config';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -21,11 +23,22 @@ const ProfilePage = () => {
     phone: '',
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   // Fetch user profile on component mount
   useEffect(() => {
-    dispatch(getUserProfileCurrent());
+    const loadUserProfileCurrent = async () => {
+      setLoading(true); // Start loading indicator
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Delay for 1 second
+      dispatch(getUserProfileCurrent())
+        .unwrap()
+        .catch((err) => {
+          toast.error(`Failed to fetch profile: ${err.message || 'unknown error'}`);
+        })
+        .finally(() => setLoading(false)); // Stop loading indicator
+    };
+
+    loadUserProfileCurrent();
   }, [dispatch]);
 
   // Update form data when user profile changes
@@ -48,6 +61,7 @@ const ProfilePage = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
   const handleImageUpload = (e) => {
     const selectedImage = e.target.files[0];
     if (!selectedImage) return;
@@ -90,7 +104,7 @@ const ProfilePage = () => {
     }
 
     try {
-      setLoading(true);
+      setLoading(true); // Start loading indicator
       const actionResult = await dispatch(updateCurrentProfile(profileData));
 
       if (updateCurrentProfile.fulfilled.match(actionResult)) {
@@ -114,11 +128,9 @@ const ProfilePage = () => {
         text: 'An error occurred during profile update.',
       });
     } finally {
-      setLoading(false);
+      setLoading(false); // Stop loading indicator
     }
   };
-
-  if (isLoading) return <CircularProgress />;
 
   return (
     <Container maxWidth={false} sx={{ mt: 4, maxWidth: '1400px' }}>
@@ -227,6 +239,7 @@ const ProfilePage = () => {
           </Box>
         </Box>
       </Box>
+      <ToastContainer position="top-right" autoClose={3000} />
     </Container>
   );
 };

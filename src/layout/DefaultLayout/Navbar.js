@@ -1,22 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AppBar, Toolbar, IconButton, Box, Button, Menu, MenuItem } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box, Button, Menu, MenuItem, Typography } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ShoppingBagIcon from '@mui/icons-material/ShoppingBag';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
 import { Link as ScrollLink } from 'react-scroll'; // Import from react-scroll
+import CartSummaryModal from '../../components/Modal/CartModal/CartSummaryModal ';
+import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const profile = useSelector((state) => state.userProfile);
+
   const role = user?.role;
+  const cartCount = useSelector((state) => state.cart.items.length);
+
+  // Fetch profile on component mount and when isAuthenticated changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getUserProfileCurrent());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate('/login');
   };
+  const [isCartOpen, setCartOpen] = useState(false);
 
   // State để quản lý menu dropdown của avatar
   const [anchorEl, setAnchorEl] = useState(null);
@@ -97,33 +110,39 @@ const Navbar = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
           {isAuthenticated ? (
             <>
+              <Typography variant="body1" sx={{ color: 'black', fontWeight: 'bold' }}>
+                Welcome, {profile.user?.fullName || 'User'}
+              </Typography>
               {/* Customer: Show Account & Cart */}
               {role === 'Customer' && (
                 <>
                   <IconButton sx={{ color: 'black' }} onClick={handleClick}>
                     <AccountCircleIcon />
                   </IconButton>
-                  <IconButton sx={{ color: 'black', position: 'relative' }}>
+                  <IconButton sx={{ color: 'black', position: 'relative' }} onClick={() => setCartOpen(true)}>
                     <ShoppingBagIcon />
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        top: -5,
-                        right: -5,
-                        backgroundColor: 'black',
-                        color: 'white',
-                        borderRadius: '50%',
-                        width: '18px',
-                        height: '18px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: '12px',
-                      }}
-                    >
-                      0
-                    </Box>
+                    {cartCount > 0 && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -5,
+                          right: -5,
+                          backgroundColor: 'black',
+                          color: 'white',
+                          borderRadius: '50%',
+                          width: '18px',
+                          height: '18px',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          fontSize: '12px',
+                        }}
+                      >
+                        {cartCount}
+                      </Box>
+                    )}
                   </IconButton>
+                  <CartSummaryModal open={isCartOpen} onClose={() => setCartOpen(false)} />
                 </>
               )}
 

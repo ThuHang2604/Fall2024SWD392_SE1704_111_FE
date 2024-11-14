@@ -34,6 +34,17 @@ export const getBookingHistory = createAsyncThunk('booking/getBookingHistory', a
     return rejectWithValue(error.response?.data || 'Failed to fetch booking history');
   }
 });
+// Thunk: Get bookings of a stylist via API
+export const getBookingsOfStylist = createAsyncThunk('booking/getBookingsOfStylist', async (_, { rejectWithValue }) => {
+  try {
+    const response = await instance.get('/api/v1/booking/bookingOfStylist');
+    console.log('Response from API:', response.data); // Add this log
+    return response.data.data; // Return only the data array
+  } catch (error) {
+    console.error('Error fetching bookings of stylist:', error);
+    return rejectWithValue(error.response?.data || 'Failed to fetch bookings of stylist');
+  }
+});
 
 // Slice cho Booking
 const bookingSlice = createSlice({
@@ -75,6 +86,19 @@ const bookingSlice = createSlice({
         state.bookings = action.payload; // Lưu lịch sử booking
       })
       .addCase(getBookingHistory.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(getBookingsOfStylist.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getBookingsOfStylist.fulfilled, (state, action) => {
+        // console.log('Fulfilled action payload:', action.payload);
+        state.isLoading = false;
+        state.bookings = action.payload || []; // Update bookings with fetched data
+      })
+      .addCase(getBookingsOfStylist.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { publicRoutes, adminRoutes } from './routes/routes';
 import './App.css';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import DefaultLayout from './layout/DefaultLayout';
 import AdminLayout from './layout/AdminLayout';
@@ -13,6 +15,7 @@ import FeedbackList from './pages/UserProfile/Feedback/Feedback';
 function App() {
   return (
     <div className="App">
+      <ToastContainer position="top-right" autoClose={3000} />
       <BrowserRouter>
         <Routes>
           {/* Puclic routes */}

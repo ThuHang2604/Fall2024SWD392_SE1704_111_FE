@@ -8,6 +8,8 @@ import voucherReducer from './slice/voucherSlice';
 import hairServiceReducer from './slice/hairServiceSlice';
 import feedbackReducer from './slice/feedbackSlice';
 import scheduleReducer from './slice/scheduleSlice';
+import cartReducer from './slice/cartSlice';
+import toastReducer from './slice/toastSlice';
 const persistConfig = {
   key: 'root',
   storage,
@@ -23,6 +25,8 @@ const rootReducer = combineReducers({
   hairService: hairServiceReducer,
   feedBack: feedbackReducer,
   schedule: scheduleReducer,
+  cart: cartReducer,
+  toast: toastReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);

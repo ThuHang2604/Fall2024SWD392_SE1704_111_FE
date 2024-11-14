@@ -17,7 +17,8 @@ const BookingModal = ({ open, onClose, service, onNext }) => {
   }, [service]);
 
   const handleNext = () => {
-    onNext({ service, stylist: selectedStylist });
+    // Include an identifier to update the correct booking entry
+    onNext({ service, stylist: selectedStylist, serviceId: service.serviceId });
   };
 
   return (

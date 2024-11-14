@@ -3,9 +3,12 @@ import { Box, Typography } from '@mui/material';
 import BookingListTable from './BookingListTable';
 
 function BookingList({ bookingList, error, fetchBookings }) {
+  // console.log('Booking List prop in BookingList component:', bookingList);
+  // console.log('Booking List from Redux:', bookingList);
+
   return (
     <div>
-      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40 }}>
+      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40, fontFamily: 'fantasy' }}>
         Booking List
       </Typography>
 

@@ -1,19 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Button from '@mui/material/Button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableFooter,
+  TablePagination,
+  TextField,
+  TableSortLabel,
+  Box,
+  Typography,
+  CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Chip,
+} from '@mui/material';
+import { tableCellClasses } from '@mui/material/TableCell';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
+    backgroundColor: theme.palette.grey[700],
     color: theme.palette.common.white,
     fontSize: 18,
   },
@@ -31,11 +44,46 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function ServiceListTable({ serviceList = [] }) {
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+const getStatusChip = (status) => {
+  return status === 1 ? <Chip label="Active" color="success" /> : <Chip label="Inactive" color="default" />;
+};
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - serviceList?.length) : 0;
+function ServiceListTable({ serviceList = [] }) {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [serviceNameFilter, setServiceNameFilter] = useState('');
+  const [sortConfig, setSortConfig] = useState({ key: 'serviceId', direction: 'asc' });
+  const [loading, setLoading] = useState(false);
+  const [selectedService, setSelectedService] = useState(null);
+  const [open, setOpen] = useState(false);
+
+  const handleOpenModal = (service) => {
+    setSelectedService(service);
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedService(null);
+  };
+
+  const handleSort = (key) => {
+    setSortConfig((prevConfig) => ({
+      key,
+      direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
+    }));
+  };
+
+  const filteredAndSortedServices = serviceList
+    .filter((service) => service.serviceName.toLowerCase().includes(serviceNameFilter.toLowerCase()))
+    .sort((a, b) => {
+      if (sortConfig.key === 'serviceId') {
+        return sortConfig.direction === 'asc' ? a.serviceId - b.serviceId : b.serviceId - a.serviceId;
+      } else if (sortConfig.key === 'price') {
+        return sortConfig.direction === 'asc' ? a.price - b.price : b.price - a.price;
+      }
+      return 0;
+    });
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -43,101 +91,143 @@ function ServiceListTable({ serviceList = [] }) {
 
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    setPage(0); // Reset to first page when rows per page changes
   };
 
   return (
-    <TableContainer component={Paper} sx={{ margin: '20px', maxWidth: 'calc(100% - 40px)' }}>
-      <Table sx={{ minWidth: 700 }} aria-label="service table">
-        <TableHead>
-          <TableRow>
-            {[
-              'Service ID',
-              'Service Name',
-              'Description',
-              'Price',
-              'Estimate Time',
-              'Image Link',
-              'Create By',
-              'Create Date',
-              'Update By',
-              'Update Date',
-              'Actions',
-            ].map((header) => (
-              <StyledTableCell key={header}>{header}</StyledTableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {serviceList.length > 0 ? (
-            (rowsPerPage > 0
-              ? serviceList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : serviceList
-            ).map((service) => (
-              <StyledTableRow key={service.serviceId}>
-                <StyledTableCell component="th" scope="row">
-                  {service.serviceId}
-                </StyledTableCell>
-                <StyledTableCell>{service.serviceName}</StyledTableCell>
-                <StyledTableCell>{service.description}</StyledTableCell>
-                <StyledTableCell>{service.price}</StyledTableCell>
-                <StyledTableCell>{service.estimateTime}</StyledTableCell>
+    <Box sx={{ padding: 2 }}>
+      <Box sx={{ display: 'flex', gap: 2, mb: 2, p: 2, border: '2px solid #ccc', borderRadius: 2 }}>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: '700' }}>
+            Service Name
+          </Typography>
+          <TextField
+            label="Search by Service Name"
+            variant="outlined"
+            value={serviceNameFilter}
+            onChange={(e) => setServiceNameFilter(e.target.value)}
+          />
+        </Box>
+      </Box>
+
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <TableContainer component={Paper} sx={{ margin: '20px', maxWidth: 'calc(100% - 40px)' }}>
+          <Table sx={{ minWidth: 700 }} aria-label="service table">
+            <TableHead>
+              <TableRow>
                 <StyledTableCell>
-                  <a href={service.imageLink} target="_blank" rel="noopener noreferrer">
-                    {service.imageLink}
-                  </a>
+                  <TableSortLabel
+                    active={sortConfig.key === 'serviceId'}
+                    direction={sortConfig.direction}
+                    onClick={() => handleSort('serviceId')}
+                  >
+                    Service ID
+                  </TableSortLabel>
                 </StyledTableCell>
-                <StyledTableCell>{service.createBy}</StyledTableCell>
-                <StyledTableCell>{new Date(service.createDate).toLocaleString()}</StyledTableCell>
-                <StyledTableCell>{service.updateBy}</StyledTableCell>
-                <StyledTableCell>{new Date(service.updateDate).toLocaleString()}</StyledTableCell>
+                <StyledTableCell>Image Link</StyledTableCell>
+                <StyledTableCell>Service Name</StyledTableCell>
+                <StyledTableCell>Description</StyledTableCell>
                 <StyledTableCell>
-                  {/* <Button variant="contained" color="primary" size="small" style={{ marginRight: 10 }}>
-                    Update
-                  </Button>
-                  <Button variant="contained" color="error" size="small">
-                    Remove
-                  </Button> */}
+                  <TableSortLabel
+                    active={sortConfig.key === 'price'}
+                    direction={sortConfig.direction}
+                    onClick={() => handleSort('price')}
+                  >
+                    Price
+                  </TableSortLabel>
                 </StyledTableCell>
-              </StyledTableRow>
-            ))
-          ) : (
-            <TableRow>
-              <StyledTableCell colSpan={11} align="center">
-                No services found.
-              </StyledTableCell>
-            </TableRow>
-          )}
-          {emptyRows > 0 && (
-            <TableRow style={{ height: 53 * emptyRows }}>
-              <StyledTableCell colSpan={11} />
-            </TableRow>
-          )}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-              colSpan={11}
-              count={serviceList?.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              sx={{
-                '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select, & .MuiTablePagination-menuItem':
-                  {
-                    fontSize: '16px',
-                  },
-                '& .MuiTablePagination-actions': {
-                  fontSize: '16px',
-                },
-              }}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+                <StyledTableCell>Estimate Time</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredAndSortedServices.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((service) => (
+                <StyledTableRow
+                  key={service.serviceId}
+                  onClick={() => handleOpenModal(service)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <StyledTableCell>{service.serviceId}</StyledTableCell>
+                  <StyledTableCell>
+                    <Box
+                      component="img"
+                      src={service.imageLink}
+                      alt={service.serviceName}
+                      sx={{ width: 50, height: 50, objectFit: 'cover', borderRadius: '4px' }}
+                    />
+                  </StyledTableCell>
+                  <StyledTableCell>{service.serviceName}</StyledTableCell>
+                  <StyledTableCell>{service.description}</StyledTableCell>
+                  <StyledTableCell>{service.price}</StyledTableCell>
+                  <StyledTableCell>{service.estimateTime}</StyledTableCell>
+                </StyledTableRow>
+              ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                  colSpan={6}
+                  count={filteredAndSortedServices.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+      )}
+
+      {/* Service Detail Modal */}
+      <Dialog open={open} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+        {selectedService && (
+          <>
+            <DialogTitle>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6">Service : {selectedService.serviceName}</Typography>
+                {getStatusChip(selectedService.status)}
+              </Box>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Box sx={{ position: 'relative', width: '100%', borderRadius: 4, overflow: 'hidden' }}>
+                {/* Image with overlay */}
+                <Box
+                  component="img"
+                  src={selectedService.imageLink}
+                  alt={selectedService.serviceName}
+                  sx={{ width: '100%', maxHeight: 300, objectFit: 'cover' }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    width: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+                    color: 'white',
+                    padding: 2,
+                  }}
+                >
+                  <Typography variant="subtitle1">{selectedService.description}</Typography>
+                  <Typography variant="body2">Price: {selectedService.price} VND</Typography>
+                  <Typography variant="body2">Estimated Time: {selectedService.estimateTime}</Typography>
+                </Box>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseModal} color="primary" variant="contained">
+                Close
+              </Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
+    </Box>
   );
 }
 

@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Button, Modal, TextField, Box, Typography } from '@mui/material';
 import { createReport } from '@/api/ReportApi';
 
-const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) => {
+const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {}, onError = () => {} }) => {
   const [reportName, setReportName] = useState('');
   const [reportLink, setReportLink] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,8 +18,13 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
   };
 
   const handleSubmit = async () => {
-    if (!reportName || !reportLink) {
-      toast.error('Report name and link are required');
+    if (!reportName) {
+      onError('Report name is required');
+      return;
+    }
+
+    if (!reportLink) {
+      onError('Report link must be a valid URL');
       return;
     }
 
@@ -40,10 +45,11 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {} }) =
         }, 1000);
         handleClose();
       } else {
-        toast.error(`Failed to create report: ${response.message}`);
+        onError(`Failed to create report: ${response.message}`);
       }
     } catch (error) {
       console.error('Error creating report:', error);
+      onError('Report link must be a valid URL');
     } finally {
       setIsSubmitting(false);
     }

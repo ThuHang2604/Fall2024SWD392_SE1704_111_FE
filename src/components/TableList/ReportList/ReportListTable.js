@@ -1,25 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import TableFooter from '@mui/material/TableFooter';
-import TablePagination from '@mui/material/TablePagination';
-import Button from '@mui/material/Button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  TableFooter,
+  TablePagination,
+  Button,
+  TextField,
+  Box,
+  TableSortLabel,
+  Typography,
+  CircularProgress,
+} from '@mui/material';
 import { removeReport } from '@/api/ReportApi';
 import ConfirmRemoveDialog from '@/components/Modal/DialogConfirm/ComfirmRemove';
 import UpdateReportModal from '@/components/Modal/ReportModal/UpdateReport';
+import { tableCellClasses } from '@mui/material/TableCell';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
+    backgroundColor: theme.palette.grey[700],
     color: theme.palette.common.white,
     fontSize: 18,
   },
@@ -45,7 +53,39 @@ function ReportListTable({ reportList = [], onRefresh }) {
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - reportList?.length) : 0;
+  // Search and sort states
+  const [reportNameFilter, setReportNameFilter] = useState('');
+  const [updateByFilter, setUpdateByFilter] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setLoading(false);
+    }, 500); // 500ms delay
+    setLoading(true);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [reportNameFilter, updateByFilter]);
+
+  const handleSort = () => {
+    setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
+
+  const sortedAndFilteredReports = reportList
+    .filter(
+      (report) =>
+        report.reportName.toLowerCase().includes(reportNameFilter.toLowerCase()) &&
+        report.updateBy.toLowerCase().includes(updateByFilter.toLowerCase()),
+    )
+    .sort((a, b) => {
+      if (sortDirection === 'asc') {
+        return a.reportId - b.reportId;
+      }
+      return b.reportId - a.reportId;
+    });
+
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - sortedAndFilteredReports.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -97,95 +137,82 @@ function ReportListTable({ reportList = [], onRefresh }) {
 
   return (
     <>
-      <TableContainer component={Paper} sx={{ margin: '20px', maxWidth: '100%', overflow: 'auto' }}>
-        <Table sx={{ minWidth: 700 }} aria-label="report table">
-          <TableHead>
-            <TableRow>
-              {['Report ID', 'Report Name', 'Report Link', 'Status', 'Create By', 'Update By', 'Actions'].map(
-                (header) => (
-                  <StyledTableCell key={header}>{header}</StyledTableCell>
-                ),
-              )}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {reportList.length > 0 ? (
-              (rowsPerPage > 0
-                ? reportList.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                : reportList
-              ).map((report) => (
-                <StyledTableRow key={report.reportId}>
-                  <StyledTableCell>{report.reportId}</StyledTableCell>
-                  <StyledTableCell>{report.reportName}</StyledTableCell>
-                  <StyledTableCell>
-                    <Link href={report.reportLink} target="_blank" rel="noopener noreferrer">
-                      {report.reportLink}
-                    </Link>
-                  </StyledTableCell>
-                  <StyledTableCell>{report.status}</StyledTableCell>
-                  <StyledTableCell>{report.createBy}</StyledTableCell>
-                  <StyledTableCell>{report.updateBy}</StyledTableCell>
-                  <StyledTableCell>
-                    {/* UpdateButton */}
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      style={{ marginRight: 10 }}
-                      onClick={() => handleOpenUpdateModal(report)}
-                    >
-                      Update
-                    </Button>
-                    {/* RemoveButton */}
-                    <Button
-                      variant="contained"
-                      color="error"
-                      size="small"
-                      onClick={() => handleOpenDialog(report.reportId)}
-                    >
-                      Remove
-                    </Button>
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))
-            ) : (
-              <TableRow>
-                <StyledTableCell colSpan={7} align="center">
-                  No reports found.
-                </StyledTableCell>
-              </TableRow>
-            )}
-            {emptyRows > 0 && (
-              <TableRow style={{ height: 53 * emptyRows }}>
-                <StyledTableCell colSpan={7} />
-              </TableRow>
-            )}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={7}
-                count={reportList?.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                sx={{
-                  '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows, & .MuiTablePagination-select, & .MuiTablePagination-menuItem':
-                    {
-                      fontSize: '16px',
-                    },
-                  '& .MuiTablePagination-actions': {
-                    fontSize: '16px',
-                  },
-                }}
-              />
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </TableContainer>
+      <Box sx={{ padding: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, mb: 2, p: 2, border: '2px solid #ccc', borderRadius: 2 }}>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: '700' }}>
+              Report Name
+            </Typography>
+            <TextField
+              label="Search by Report Name"
+              variant="outlined"
+              value={reportNameFilter}
+              onChange={(e) => setReportNameFilter(e.target.value)}
+            />
+          </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: '700' }}>
+              Update By
+            </Typography>
+            <TextField
+              label="Search by Updated By"
+              variant="outlined"
+              value={updateByFilter}
+              onChange={(e) => setUpdateByFilter(e.target.value)}
+            />
+          </Box>
+        </Box>
 
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
+            <Table sx={{ minWidth: 700 }} aria-label="report table">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>
+                    <TableSortLabel active direction={sortDirection} onClick={handleSort}>
+                      Report ID
+                    </TableSortLabel>
+                  </StyledTableCell>
+                  <StyledTableCell>Report Name</StyledTableCell>
+                  <StyledTableCell>Report Link</StyledTableCell>
+                  <StyledTableCell>Status</StyledTableCell>
+                  <StyledTableCell>Create By</StyledTableCell>
+                  <StyledTableCell>Update By</StyledTableCell>
+                  <StyledTableCell>Actions</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {sortedAndFilteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((report) => (
+                  <StyledTableRow key={report.reportId}>
+                    <StyledTableCell>{report.reportId}</StyledTableCell>
+                    <StyledTableCell>{report.reportName}</StyledTableCell>
+                    <StyledTableCell>
+                      <Link to={report.reportLink} target="_blank" rel="noopener noreferrer">
+                        {report.reportLink}
+                      </Link>
+                    </StyledTableCell>
+                    <StyledTableCell>{report.status}</StyledTableCell>
+                    <StyledTableCell>{report.createBy}</StyledTableCell>
+                    <StyledTableCell>{report.updateBy}</StyledTableCell>
+                    <StyledTableCell>
+                      <Button variant="contained" color="primary" onClick={() => handleOpenUpdateModal(report)}>
+                        Update
+                      </Button>
+                      <Button variant="contained" color="error" onClick={() => handleOpenDialog(report.reportId)}>
+                        Remove
+                      </Button>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </Box>
       <ConfirmRemoveDialog
         open={openDialog}
         onClose={handleCloseDialog}
@@ -193,8 +220,6 @@ function ReportListTable({ reportList = [], onRefresh }) {
         title="Confirm Remove"
         content="Are you sure you want to remove this report?"
       />
-
-      {/* Update Modal */}
       {selectedReport && (
         <UpdateReportModal
           open={openUpdateModal}

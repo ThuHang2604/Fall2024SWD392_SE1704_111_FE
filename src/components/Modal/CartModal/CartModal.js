@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, Typography, Select, MenuItem, Button } from '@mui/material';
+import { Modal, Box, Typography, Select, MenuItem, Button, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { getScheduleList } from '@/api/ScheduleApi';
 import './styles.css';
 
@@ -11,7 +12,7 @@ const formatDate = (dateString) => {
   return `${day}/${month}/${year}`;
 };
 
-const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
+const CartModal = ({ open, onClose, bookingData, setBookingData, onNext, onBack }) => {
   const [schedules, setSchedules] = useState([]);
   const [selectedSchedules, setSelectedSchedules] = useState([]);
 
@@ -48,9 +49,13 @@ const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
   return (
     <Modal open={open} onClose={onClose}>
       <Box className="modal-box">
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Select Schedule(s)
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+          {/* <IconButton onClick={onBack}>
+            <ArrowBackIcon />
+          </IconButton> */}
+          <Typography variant="h6">Select Schedule(s)</Typography>
+        </Box>
+
         <Select multiple value={selectedSchedules} onChange={handleScheduleSelect} fullWidth>
           {schedules.map((schedule) => (
             <MenuItem key={schedule.scheduleId} value={schedule.scheduleId}>
@@ -58,6 +63,7 @@ const CartModal = ({ open, onClose, bookingData, setBookingData, onNext }) => {
             </MenuItem>
           ))}
         </Select>
+
         <Button
           onClick={handleNext}
           disabled={selectedSchedules.length === 0}

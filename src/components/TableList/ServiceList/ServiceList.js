@@ -5,7 +5,7 @@ import ServiceListTable from './ServiceListTable';
 function ServiceList({ serviceList, error }) {
   return (
     <div>
-      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40 }}>
+      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40, fontFamily: 'fantasy' }}>
         Service List
       </Typography>
 

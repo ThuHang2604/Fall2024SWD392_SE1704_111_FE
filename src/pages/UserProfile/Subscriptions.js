@@ -2,9 +2,12 @@ import React, { useState } from 'react';
 import { Box, Typography, Container } from '@mui/material';
 import ProfileSidebar from './ProSidebar'; // Import the sidebar component
 import { useSelector } from 'react-redux';
+import { Backdrop, CircularProgress } from '@mui/material';
+
 const SubscriptionPage = () => {
   const [selectedTab, setSelectedTab] = useState('subscriptions');
   const { user } = useSelector((state) => state.auth);
+  const [loading, setLoading] = useState(true);
 
   return (
     <Container maxWidth={false} sx={{ mt: 4, maxWidth: '1400px', maxHeight: 'auto' }}>

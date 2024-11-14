@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import * as Yup from 'yup';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container, TextField, Button, Typography, Box, Card, CardContent } from '@mui/material';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import {
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Card,
+  CardContent,
+  CircularProgress,
+  Backdrop,
+} from '@mui/material';
+import { Formik, Form, Field } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { jwtDecode } from 'jwt-decode';
 import { loginUser } from '../redux/slice/authSlice';
@@ -12,7 +21,6 @@ import { loginUser } from '../redux/slice/authSlice';
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { isLoading, isAuthenticated, error, token } = useSelector((state) => state.auth);
   const [showPassword, setShowPassword] = useState(false);
   const [decodedToken, setDecodedToken] = useState(null);
@@ -22,19 +30,47 @@ function LoginPage() {
     password: '',
   };
 
-  const FORM_VALIDATION = Yup.object().shape({
-    username: Yup.string().required('Username is required'),
-    password: Yup.string().required('Password is required'),
-  });
-
   const handleClick = () => {
     setShowPassword((prev) => !prev);
   };
 
   const handleSubmitLogin = async (values, { setSubmitting }) => {
-    await dispatch(loginUser(values)); // Dispatch login action
+    const { username, password } = values;
+
+    // Validate fields manually
+    if (!username) {
+      toast.error('Username is required');
+      setSubmitting(false);
+      return;
+    }
+
+    if (!password) {
+      toast.error('Password is required');
+      setSubmitting(false);
+      return;
+    }
+
+    setLoadingDelay(true); // Start loading indicator with delay
+    const result = await dispatch(loginUser(values));
     setSubmitting(false);
+    setLoadingDelay(false); // Stop the delayed loading indicator
+
+    // If login fails, show a toast notification
+    if (result.error) {
+      toast.error('Login failed. Please check your username and password.');
+    }
   };
+
+  // Additional loading state with delay for a minimum of 1 second
+  const [loadingDelay, setLoadingDelay] = useState(false);
+  useEffect(() => {
+    if (loadingDelay) {
+      const timer = setTimeout(() => {
+        setLoadingDelay(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [loadingDelay]);
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -49,14 +85,13 @@ function LoginPage() {
     }
   }, [isAuthenticated, token, navigate]);
 
-  // useEffect(() => {
-  //   if (error) {
-  //     toast.error(error);
-  //   }
-  // }, [error]);
-
   return (
     <Container maxWidth={false} disableGutters>
+      {/* Loading Backdrop */}
+      <Backdrop open={loadingDelay} sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+
       <Box
         sx={{
           minHeight: '100vh',
@@ -84,7 +119,6 @@ function LoginPage() {
             {!isAuthenticated ? (
               <Formik
                 initialValues={INITIAL_FORM_STATE}
-                validationSchema={FORM_VALIDATION}
                 onSubmit={handleSubmitLogin}
                 validateOnChange={true}
                 validateOnBlur={true}
@@ -94,7 +128,6 @@ function LoginPage() {
                     <Field name="username">
                       {({ field }) => <TextField fullWidth margin="normal" label="Username" {...field} />}
                     </Field>
-                    <ErrorMessage name="username" component="div" className="text-danger" />
 
                     <Field name="password">
                       {({ field }) => (
@@ -107,7 +140,6 @@ function LoginPage() {
                         />
                       )}
                     </Field>
-                    <ErrorMessage name="password" component="div" className="text-danger" />
 
                     <Box display="flex" justifyContent="space-between" alignItems="center">
                       <Link to="/forgot-password">Forgot password?</Link>

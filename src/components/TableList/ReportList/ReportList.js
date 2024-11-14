@@ -6,7 +6,7 @@ function ReportList({ reportList, error, onRefresh }) {
   // Thêm onRefresh
   return (
     <div>
-      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40 }}>
+      <Typography variant="h3" sx={{ marginLeft: '10px', marginBottom: '20px', fontSize: 40, fontFamily: 'fantasy' }}>
         Report List
       </Typography>
 
