@@ -1,56 +1,41 @@
+// ServiceCard.js
 import React, { useState } from 'react';
 import { Container, Typography, Card, CardContent, CardMedia, Button, Grid } from '@mui/material';
-import BookingModal from '@/components/Modal/BookingModal/BookingModal2';
-import FinalScheduleModal from '@/components/Card/ServiceCard/FinalScheduleModal';
 import CartModal from '@/components/Modal/CartModal/CartModal';
+import AppointmentSummaryModal from '@/components/Modal/CartModal/AppointmentSummaryModal';
+import { useNavigate } from 'react-router-dom';
 
 function ServiceCard({ serviceCard }) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
-  const [cartModalOpen, setCartModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
+  const navigate = useNavigate();
+  const [summaryModalOpen, setSummaryModalOpen] = useState(false);
   const [bookingData, setBookingData] = useState([]);
 
   const handleSelectService = (service) => {
-    setSelectedService(service);
-    setModalOpen(true);
+    console.log('Service selected:', service);
+    setBookingData([...bookingData, { ...service, stylist: null }]); // Add service with default "any stylist"
+    setSummaryModalOpen(true);
   };
 
-  const handleStylistNext = (data) => {
-    setBookingData((prev) => [...prev, data]);
-    setModalOpen(false);
-    setScheduleModalOpen(true);
+  const handleAddService = () => {
+    console.log('Adding another service...');
+    setSummaryModalOpen(false);
   };
 
-  const handleScheduleNext = (updatedBookingData) => {
-    setBookingData(updatedBookingData);
-    setScheduleModalOpen(false);
-    setCartModalOpen(true);
+  const handleProceedToCart = () => {
+    setSummaryModalOpen(false);
+    // Navigate to SchedulePage with bookingData
+    navigate('/schedule', { state: { bookingData } });
   };
 
-  const handleProceedToFinal = () => {
-    setCartModalOpen(false);
-    setScheduleModalOpen(true);
+  const handleEditStylist = (service, stylist) => {
+    setBookingData((prevData) =>
+      prevData.map((item) => (item.serviceId === service.serviceId ? { ...item, stylist } : item)),
+    );
+  };
+  const handleDeleteService = (index) => {
+    setBookingData((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleClearBookingData = () => {
-    setBookingData([]);
-  };
-
-  const handleRemoveService = (index) => {
-    const updatedBookingData = bookingData.filter((_, i) => i !== index);
-    setBookingData(updatedBookingData);
-  };
-
-  // Add a function to handle back action from FinalScheduleModal to CartModal
-  const handleBackToCart = () => {
-    setCartModalOpen(true); // Reopen CartModal
-    setCartModalOpen(false); // Close FinalScheduleModal
-  };
-  const handleBackToStylist = () => {
-    setScheduleModalOpen(false);
-    setModalOpen(true);
-  };
   return (
     <Container>
       <Grid container spacing={3}>
@@ -83,32 +68,14 @@ function ServiceCard({ serviceCard }) {
         ))}
       </Grid>
 
-      <BookingModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        service={selectedService}
-        onNext={handleStylistNext}
-      />
-
-      <CartModal
-        open={scheduleModalOpen}
-        onClose={() => setScheduleModalOpen(false)}
+      <AppointmentSummaryModal
+        open={summaryModalOpen}
+        onClose={() => setSummaryModalOpen(false)}
         bookingData={bookingData}
-        setBookingData={setBookingData}
-        onNext={handleScheduleNext}
-        onProceedToFinal={handleProceedToFinal}
-        onBack={handleBackToStylist}
-      />
-
-      <FinalScheduleModal
-        open={cartModalOpen}
-        onClose={() => {
-          setCartModalOpen(false);
-        }}
-        bookingData={bookingData}
-        onRemoveService={handleRemoveService}
-        onClearBookingData={handleClearBookingData}
-        onBack={handleBackToCart} // Pass the back handler to FinalScheduleModal
+        onEditStylist={handleEditStylist} // Pass handleEditStylist here
+        onAddService={handleAddService}
+        onProceed={handleProceedToCart}
+        onDeleteService={handleDeleteService}
       />
     </Container>
   );

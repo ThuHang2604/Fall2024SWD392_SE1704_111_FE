@@ -25,6 +25,17 @@ export const fetchScheduleById = createAsyncThunk(
   },
 );
 
+// Thunk for creating a new schedule
+export const createSchedule = createAsyncThunk('schedule/createSchedule', async (scheduleData, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post('/api/v1/schedule/createSchedule', scheduleData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create schedule:', error);
+    return rejectWithValue(error.response?.data || 'Failed to create schedule');
+  }
+});
+
 const scheduleSlice = createSlice({
   name: 'schedule',
   initialState: {
@@ -63,6 +74,23 @@ const scheduleSlice = createSlice({
       .addCase(fetchScheduleById.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      });
+
+    // Handle createSchedule
+    builder
+      .addCase(createSchedule.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(createSchedule.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.scheduleList.push(action.payload); // Add new schedule to list
+        console.log('Schedule created successfully:', action.payload);
+      })
+      .addCase(createSchedule.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+        console.error('Error creating schedule:', action.payload);
       });
   },
 });

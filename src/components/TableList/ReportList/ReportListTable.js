@@ -52,8 +52,6 @@ function ReportListTable({ reportList = [], onRefresh }) {
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState(null);
   const [selectedReport, setSelectedReport] = useState(null);
-
-  // Search and sort states
   const [reportNameFilter, setReportNameFilter] = useState('');
   const [updateByFilter, setUpdateByFilter] = useState('');
   const [sortDirection, setSortDirection] = useState('asc');
@@ -62,7 +60,7 @@ function ReportListTable({ reportList = [], onRefresh }) {
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
       setLoading(false);
-    }, 500); // 500ms delay
+    }, 500);
     setLoading(true);
 
     return () => clearTimeout(delayDebounceFn);
@@ -85,7 +83,7 @@ function ReportListTable({ reportList = [], onRefresh }) {
       return b.reportId - a.reportId;
     });
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - sortedAndFilteredReports.length) : 0;
+  const emptyRows = Math.max(0, (1 + page) * rowsPerPage - sortedAndFilteredReports.length);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -130,7 +128,7 @@ function ReportListTable({ reportList = [], onRefresh }) {
     setSelectedReport(null);
   };
 
-  const handleUpdateSuccess = (updatedReport) => {
+  const handleUpdateSuccess = () => {
     onRefresh();
     handleCloseUpdateModal();
   };
@@ -208,7 +206,24 @@ function ReportListTable({ reportList = [], onRefresh }) {
                     </StyledTableCell>
                   </StyledTableRow>
                 ))}
+                {emptyRows > 0 && (
+                  <StyledTableRow style={{ height: 53 * emptyRows }}>
+                    <StyledTableCell colSpan={7} />
+                  </StyledTableRow>
+                )}
               </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25]}
+                    count={sortedAndFilteredReports.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </TableRow>
+              </TableFooter>
             </Table>
           </TableContainer>
         )}

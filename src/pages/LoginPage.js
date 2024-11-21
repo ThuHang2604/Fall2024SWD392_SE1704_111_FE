@@ -79,6 +79,9 @@ function LoginPage() {
 
       if (decoded.role === 'Customer') {
         navigate('/', { replace: true });
+      }
+      if (decoded.role === 'Manager') {
+        navigate('/dashboard');
       } else if (decoded.role === 'Stylist') {
         navigate('/dashboard');
       }

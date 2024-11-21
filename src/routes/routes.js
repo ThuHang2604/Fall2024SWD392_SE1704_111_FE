@@ -12,6 +12,10 @@ import SubscriptionsPage from '@/pages/UserProfile/Subscriptions';
 // import UserBooking from '@/pages/UserProfile/UserBooking';
 import ReportListPage from '@/pages/Stylist/ReportListPage';
 import BookingListPage from '@/pages/Stylist/BookingListPage';
+import SchedulePage from '@/components/Modal/CartModal/SchedulePage';
+import DetailPage from '@/components/Modal/CartModal/DetailBooking';
+import ScheduleStylistPage from '@/pages/Stylist/SchedulePage';
+import AssignSchedulePage from '@/pages/Manager/AssignSchedulePage';
 
 const publicRoutes = [
   {
@@ -54,6 +58,16 @@ const publicRoutes = [
     path: '/subscriptions',
     component: SubscriptionsPage,
   },
+  {
+    title: 'Schedule',
+    path: '/schedule',
+    component: SchedulePage,
+  },
+  {
+    title: 'DetailBooking',
+    path: '/booking-detail',
+    component: DetailPage,
+  },
 ];
 
 const memberRoutes = [
@@ -65,11 +79,6 @@ const memberRoutes = [
 ];
 
 const adminRoutes = [
-  {
-    title: 'Dashboard',
-    path: '/dashboard',
-    component: Dashboard,
-  },
   {
     title: 'Service List',
     path: '/service-list',
@@ -85,6 +94,23 @@ const adminRoutes = [
     path: '/booking-list',
     component: BookingListPage,
   },
+  {
+    title: 'Schedule List',
+    path: '/schedule-list',
+    component: ScheduleStylistPage,
+  },
+];
+const managerRoutes = [
+  {
+    title: 'Dashboard',
+    path: '/dashboard',
+    component: Dashboard,
+  },
+  {
+    title: 'AssignStylist',
+    path: '/assign-list',
+    component: AssignSchedulePage,
+  },
 ];
 
-export { publicRoutes, memberRoutes, adminRoutes };
+export { publicRoutes, memberRoutes, adminRoutes, managerRoutes };

@@ -127,7 +127,7 @@ const Navbar = () => {
                           position: 'absolute',
                           top: -5,
                           right: -5,
-                          backgroundColor: 'black',
+                          backgroundColor: 'red',
                           color: 'white',
                           borderRadius: '50%',
                           width: '18px',
@@ -142,6 +142,7 @@ const Navbar = () => {
                       </Box>
                     )}
                   </IconButton>
+
                   <CartSummaryModal open={isCartOpen} onClose={() => setCartOpen(false)} />
                 </>
               )}

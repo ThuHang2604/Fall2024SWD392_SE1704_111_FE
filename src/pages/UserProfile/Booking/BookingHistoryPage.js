@@ -12,9 +12,9 @@ const BookingHistoryPage = () => {
 
   const [loading, setLoading] = useState(true); // Loading state with delay
   const [page, setPage] = useState(1); // Current page for pagination
-  const [pageSize] = useState(4); // Items per page (4 bookings)
-  const [paginatedBookings, setPaginatedBookings] = useState([]); // Current page's bookings
-  const [tabValue, setTabValue] = useState(0); // Tab control (0 for Upcoming, 1 for Past)
+  const [pageSize] = useState(4);
+  const [paginatedBookings, setPaginatedBookings] = useState([]);
+  const [tabValue, setTabValue] = useState(0);
 
   // Fetch booking history on component mount with a delay
   useEffect(() => {
@@ -33,12 +33,8 @@ const BookingHistoryPage = () => {
   }, [dispatch]);
 
   // Filter bookings based on tab selection (Upcoming or Past)
-  const upcomingBookings = bookingHistory.filter(
-    (booking) => new Date(booking.startDate) >= new Date() && ![5, 6].includes(booking.status),
-  );
-  const pastBookings = bookingHistory.filter(
-    (booking) => new Date(booking.startDate) < new Date() || [5, 6].includes(booking.status),
-  );
+  const upcomingBookings = bookingHistory.filter((booking) => [1, 2, 3, 4].includes(booking.status));
+  const pastBookings = bookingHistory.filter((booking) => [5, 6].includes(booking.status));
 
   // Paginate whenever booking list, page, or tab changes
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { publicRoutes, adminRoutes } from './routes/routes';
+import { publicRoutes, adminRoutes, managerRoutes } from './routes/routes';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -44,9 +44,27 @@ function App() {
             <Route path="feedback" element={<FeedbackList />} />
             <Route index element={<Navigate to="profile" replace />} />
           </Route>
-          {/* Admin routes */}
+          {/* Stylist routes */}
           <Route>
             {adminRoutes.map((item, index) => {
+              const Layout = item.layout || AdminLayout;
+              const Page = item.component;
+              return (
+                <Route
+                  key={index}
+                  path={item.path}
+                  element={
+                    <Layout>
+                      <Page />
+                    </Layout>
+                  }
+                />
+              );
+            })}
+          </Route>
+          {/* Manager routes */}
+          <Route>
+            {managerRoutes.map((item, index) => {
               const Layout = item.layout || AdminLayout;
               const Page = item.component;
               return (

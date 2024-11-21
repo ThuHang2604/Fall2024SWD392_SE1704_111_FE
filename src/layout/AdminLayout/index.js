@@ -7,11 +7,12 @@ import { createTheme } from '@mui/material/styles';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import AssignmentLateIcon from '@mui/icons-material/AssignmentLate';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ReportIcon from '@mui/icons-material/Report';
 import BookOnlineIcon from '@mui/icons-material/BookOnline';
-
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../redux/slice/authSlice';
 import { getUserProfileCurrent } from '@/redux/slice/userProfileSlice';
@@ -40,6 +41,18 @@ const NAVIGATION = [
     title: 'Service List',
     icon: <DesignServicesIcon />,
     onClick: (navigate) => navigate('/service-list'),
+  },
+  {
+    segment: 'schedule-list',
+    title: 'Schedule List',
+    icon: <ScheduleIcon />,
+    onClick: (navigate) => navigate('/schedule-list'),
+  },
+  {
+    segment: 'assign-list',
+    title: 'Schedule No Stylist  List',
+    icon: <AssignmentLateIcon />,
+    onClick: (navigate) => navigate('/assign-list'),
   },
 ];
 
@@ -84,9 +97,10 @@ function DashboardLayoutAccount(props) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const role = user?.role;
   const profile = useSelector((state) => state.userProfile.user);
 
+  const role = user?.role; // Get the role of the logged-in user
+  // console.log('rolse:', role);
   const handleLogout = () => {
     dispatch(logoutUser());
   };
@@ -109,19 +123,32 @@ function DashboardLayoutAccount(props) {
     };
   }, [navigate]);
 
+  const filteredNavigation = React.useMemo(() => {
+    if (role === 'Manager') {
+      return NAVIGATION.filter(
+        (item) => item.segment === 'dashboard' || item.segment === 'assign-list' || item.segment === 'service-list',
+      );
+    } else if (role === 'Stylist') {
+      return NAVIGATION.filter((item) =>
+        ['booking-list', 'report-list', 'service-list', 'schedule-list'].includes(item.segment),
+      );
+    }
+    return []; // Default empty navigation for unknown roles
+  }, [role]);
+
   return (
     <AppProvider
       session={{
         user: {
-          name: profile?.fullName || 'Bharat Kashyap',
-          email: profile?.email || 'bharatkashyap@outlook.com',
+          name: profile?.fullName || 'Default Name',
+          email: profile?.email || 'defaultemail@example.com',
           image: <AccountCircleIcon />,
         },
       }}
       authentication={{
         signOut: handleLogout,
       }}
-      navigation={NAVIGATION.map((item) => ({
+      navigation={filteredNavigation.map((item) => ({
         ...item,
         onClick: () => item.onClick(navigate),
       }))}

@@ -21,7 +21,17 @@ export const fetchServiceById = createAsyncThunk('hairService/fetchServiceById',
     return rejectWithValue(error.response?.data || 'Failed to fetch service details');
   }
 });
-
+export const fetchServiceByName = createAsyncThunk(
+  'hairService/fetchServiceByName',
+  async (serviceName, { rejectWithValue }) => {
+    try {
+      const response = await instance.get(`/api/v1/hairservice/${encodeURIComponent(serviceName)}`);
+      return response.data; // Return service details
+    } catch (error) {
+      return rejectWithValue(error.response?.data || 'Failed to fetch service by name');
+    }
+  },
+);
 // Slice definition
 const hairServiceSlice = createSlice({
   name: 'hairService',
@@ -61,6 +71,18 @@ const hairServiceSlice = createSlice({
         state.selectedService = action.payload;
       })
       .addCase(fetchServiceById.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(fetchServiceByName.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchServiceByName.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectedService = action.payload;
+      })
+      .addCase(fetchServiceByName.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

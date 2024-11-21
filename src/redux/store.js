@@ -10,6 +10,8 @@ import feedbackReducer from './slice/feedbackSlice';
 import scheduleReducer from './slice/scheduleSlice';
 import cartReducer from './slice/cartSlice';
 import toastReducer from './slice/toastSlice';
+import scheduleUserReducer from './slice/scheUserSlice';
+import userReducer from './slice/userSlice';
 const persistConfig = {
   key: 'root',
   storage,
@@ -27,6 +29,8 @@ const rootReducer = combineReducers({
   schedule: scheduleReducer,
   cart: cartReducer,
   toast: toastReducer,
+  scheduleUser: scheduleUserReducer,
+  users: userReducer,
 });
 
 const persistedAuthReducer = persistReducer(persistConfig, rootReducer);

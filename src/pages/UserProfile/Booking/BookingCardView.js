@@ -92,8 +92,7 @@ const BookingCardView = ({ bookings }) => {
                     Booking ID: {booking.bookingId}
                   </Typography>
                   <Typography variant="body2" color="textSecondary">
-                    {new Date(booking.startDate).toLocaleDateString()} -{' '}
-                    {new Date(booking.endDate).toLocaleDateString()}
+                    {new Date(booking.startDate).toLocaleDateString()}
                   </Typography>
                 </Box>
               </Box>
@@ -129,15 +128,13 @@ const BookingCardView = ({ bookings }) => {
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                         {service.serviceName}
                       </Typography>
-                      <Typography variant="body2">with {service.stylistName}</Typography>
+                      <Typography variant="body2">with {service.stylistName || 'any stylist'}</Typography>
                     </Box>
                     <Box sx={{ textAlign: 'right' }}>
                       <Typography variant="body2">Price: ${service.price}</Typography>
                       {/* Display the corresponding schedule for each service */}
                       {booking?.schedules?.[index] && (
-                        <Typography variant="body2">
-                          Schedule: {booking.schedules[index].startTime} - {booking.schedules[index].endTime}
-                        </Typography>
+                        <Typography variant="body2">Schedule: {booking.schedules[index].startTime}</Typography>
                       )}
                     </Box>
                   </Box>

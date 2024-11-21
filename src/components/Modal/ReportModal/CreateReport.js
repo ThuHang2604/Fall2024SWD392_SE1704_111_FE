@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Button, Modal, TextField, Box, Typography } from '@mui/material';
+import { Button, Modal, TextField, Box, Typography, CircularProgress } from '@mui/material';
 import { createReport } from '@/api/ReportApi';
-
+import './style.scss';
 const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {}, onError = () => {} }) => {
   const [reportName, setReportName] = useState('');
   const [reportLink, setReportLink] = useState('');
@@ -87,16 +87,20 @@ const CreateReportModal = ({ open, onClose, bookingId, onSuccess = () => {}, onE
           sx={{ marginBottom: 2 }}
         />
 
-        <Button
-          variant="contained"
-          color="primary"
-          className="full-width"
-          onClick={handleSubmit}
-          disabled={isSubmitting || !reportName || !reportLink}
-          sx={{ marginTop: 2 }}
-        >
-          {isSubmitting ? 'Submitting...' : 'Submit'}
-        </Button>
+        {isSubmitting ? (
+          <CircularProgress />
+        ) : (
+          <Button
+            variant="contained"
+            color="primary"
+            className="full-width"
+            onClick={handleSubmit}
+            disabled={!reportName || !reportLink}
+            sx={{ marginTop: 2 }}
+          >
+            Submit
+          </Button>
+        )}
       </Box>
     </Modal>
   );

@@ -45,12 +45,33 @@ export const getBookingsOfStylist = createAsyncThunk('booking/getBookingsOfStyli
     return rejectWithValue(error.response?.data || 'Failed to fetch bookings of stylist');
   }
 });
+// Thunk: Fetch bookings with no stylist via API
+export const getBookingsNoStylist = createAsyncThunk('booking/getBookingsNoStylist', async (_, { rejectWithValue }) => {
+  try {
+    const response = await instance.get('/api/v1/booking/bookings/NoStylist');
+    return response.data.data; // Assuming "schedules" is the array in the API response
+  } catch (error) {
+    console.error('Error fetching bookings with no stylist:', error);
+    return rejectWithValue(error.response?.data || 'Failed to fetch bookings with no stylist');
+  }
+});
+export const getAllBookings = createAsyncThunk('booking/getAllBookings', async (_, { rejectWithValue }) => {
+  try {
+    const response = await instance.get('/api/v1/booking/bookingList'); // Adjust the endpoint to match the screenshot
+    console.log('All bookings:', response.data); // Log response for debugging
+    return response.data.data; // Assuming 'data' contains the bookings array
+  } catch (error) {
+    console.error('Error fetching all bookings:', error);
+    return rejectWithValue(error.response?.data || 'Failed to fetch all bookings');
+  }
+});
 
 // Slice cho Booking
 const bookingSlice = createSlice({
   name: 'booking',
   initialState: {
     bookings: [],
+    bookingsNoStylist: [], // Add a separate field for "No Stylist" bookings
     isLoading: false,
     error: null,
   },
@@ -99,6 +120,30 @@ const bookingSlice = createSlice({
         state.bookings = action.payload || []; // Update bookings with fetched data
       })
       .addCase(getBookingsOfStylist.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(getBookingsNoStylist.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getBookingsNoStylist.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.bookingsNoStylist = action.payload || []; // Save "No Stylist" bookings to state
+      })
+      .addCase(getBookingsNoStylist.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(getAllBookings.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getAllBookings.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.bookings = action.payload || []; // Update state with fetched bookings
+      })
+      .addCase(getAllBookings.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

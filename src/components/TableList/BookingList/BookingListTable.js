@@ -85,7 +85,7 @@ function BookingListTable({ bookingList = [], fetchBookings }) {
   const [searchServiceName, setSearchServiceName] = useState('');
   const [searchCreatedBy, setSearchCreatedBy] = useState('');
   const [loading, setLoading] = useState(false);
-
+  console.log('bookingList:', bookingList);
   useEffect(() => {
     // Delay the filtering when search terms change
     const delayDebounceFn = setTimeout(() => {
